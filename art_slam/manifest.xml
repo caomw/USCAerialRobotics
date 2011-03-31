@@ -1,0 +1,23 @@
+<package>
+  <description brief="art_slam">
+
+     art_slam
+
+  </description>
+  <author>Yujia Zhai (Sam)</author>
+  <license>GNU GPL 2</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://uscrs.googlecode.com</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="pcl"/>
+  <depend package="sensor_msgs" />
+  <depend package="geometry_msgs" />
+  <depend package="message_filters"/>
+  <depend package="nav_msgs" />
+  <depend package="tf" />
+  <depend package="opencv2"/>
+  <depend package="cv_bridge"/>
+</package>
+
+
