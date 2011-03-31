@@ -1,5 +1,5 @@
-//      debug.hpp
-//      Common functionalities for debugging use.
+//      timer.hpp
+//      A class based on std::chrono for recording and desplaying elapsed time.
 //
 //      Copyright (C) 2011 Sam (Yujia Zhai) <yujia.zhai@usc.edu>
 //      Aerial Robotics Team, USC Robotics Society - http://www.uscrs.org - http://uscrs.googlecode.com
@@ -19,43 +19,31 @@
 //      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 //      MA 02110-1301, USA.
 
-#ifndef _DEBUG_HPP_
-#define _DEBUG_HPP_
+#ifndef _ART_HELPER_TIMER_
+#define _ART_HELPER_TIMER_
 
-#include "ros/ros.h"
-#include <sstream>
+#include <chrono>
 
 using namespace std;
 
-// Using namespace for definitions in header files.
-namespace beohawk
+namespace art
 {
-	struct Timer // using struct because its members and methods are public by default.
+	struct Timer
 	{
 		// Store the beginning time.
-		double tmp;
-		
-		// Return current time.
-		double now()
-		{
-			stringstream ss;
-			ss << ros::Time::now();
-			double x;
-			ss >> x;
-			return x;
-		}
+		monotonic_clock::time_point tmp;
 		
 		// Initialize the timer.
 		Timer(){ reset(); }
 		
 		// Reset the timer.
-		void reset(){ tmp = now(); }
+		void reset(){ tmp = monotonic_clock::now(); }
 		
 		// Return the time elapsed.
-		double span(){ return (now() - tmp);}
+		double span(){ return std::chrono::duration<double>(monotonic_clock::now() - tmp).count();}
 		
-		// Print out the time elapsed with a label.
-		void echospan(string s1){
+		// Print out the time elapsed with a user-specified label.
+		void echospan(string s1 = "Echo Span"){
 			cout << "\n[ " << s1 << " ] " << span() << ".\n";
 		}
 	};

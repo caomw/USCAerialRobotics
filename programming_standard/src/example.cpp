@@ -1,5 +1,5 @@
-//      test_surf_match.cpp
-//      SURF matching algorithm testing.
+//      exatmple.cpp
+//      An exapmle program testing SURF matching algorithm.
 //
 //      Copyright (C) 2011 Sam (Yujia Zhai) <yujia.zhai@usc.edu>
 //      Aerial Robotics Team, USC Robotics Society - http://www.uscrs.org - http://uscrs.googlecode.com
@@ -37,13 +37,13 @@
 
 // Try to use as few using as possible to avoid conflicts and confusion.
 using namespace std;
-using beohawk::Timer;
+using art::Timer;
 
 // Instead, use typedef for certain types. Geany editor can also highlight your typedef automatically.
 // You can also put typedef in header files. Geany will also hightlight for you when the header file is opened.
 typedef cv::Mat Mat;
 
-class Test_Surf_Match
+class Example
 {	
 	ros::NodeHandle nh;
 	ros::Subscriber sub_image;
@@ -61,13 +61,13 @@ class Test_Surf_Match
 	
   public:
 
-	Test_Surf_Match(ros::NodeHandle& _nh): nh(_nh), sub_image_count(0), img_src(cv::Size(640, 480), CV_8UC3), img_tgt(cv::Size(640, 480), CV_8UC3), img_result(cv::Size(1280, 480), CV_8UC3)
+	Example(ros::NodeHandle& _nh): nh(_nh), sub_image_count(0), img_src(cv::Size(640, 480), CV_8UC3), img_tgt(cv::Size(640, 480), CV_8UC3), img_result(cv::Size(1280, 480), CV_8UC3)
 	{
-		sub_image = nh.subscribe("/usb_cam/image_raw", 10, &Test_Surf_Match::sub_image_callback, this);		
+		sub_image = nh.subscribe("/usb_cam/image_raw", 10, &Example::sub_image_callback, this);		
 		cv::namedWindow("test_result");
 	}
 	
-	~Test_Surf_Match()
+	~Example()
 	{
 		// Release the pointers.
 		cv::destroyWindow("test_result");
@@ -146,11 +146,11 @@ class Test_Surf_Match
 int main(int argc, char** argv)
 {
 	//Initialize ROS node.
-	ros::init(argc, argv, "test_surf_match");
+	ros::init(argc, argv, "programming_standard_example");
 	ros::NodeHandle nh;
 	
 	//Run main functionality. You may define and run several classes if necessary.
-	Test_Surf_Match test_surf_match(nh);
+	Example example(nh);
 	
 	ros::Rate loop_rate(10); //Spin the program. Rate is in Hertz. You can also use ros::Duration (float second).
 	while(ros::ok())

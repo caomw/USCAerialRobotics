@@ -1,0 +1,13 @@
+<package>
+  <description brief="art_helper">
+  Auxiliary structs for programming.
+  </description>
+  <author>Sam(Yujia Zhai)</author>
+  <license>GNU GPL 2</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://uscrs.googlecode.com</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+</package>
+
+

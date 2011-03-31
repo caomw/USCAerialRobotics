@@ -1,11 +1,12 @@
 <package>
   <description brief="programming_standard">
-     An example of ROS package based on C++ standard.
+    An example of ROS package based on C++.
   </description>
   <author>Sam(Yujia Zhai)</author>
   <license>GNU GPL 2</license>
   <review status="unreviewed" notes=""/>
   <url>http://uscrs.googlecode.com</url>
+  <depend package="message_filters"/>
   <depend package="roscpp"/>
   <depend package="std_msgs"/>
   <depend package="opencv2"/>
@@ -13,5 +14,3 @@
   <depend package="cv_bridge"/>
   <depend package="geometry_msgs" />
 </package>
-
-
