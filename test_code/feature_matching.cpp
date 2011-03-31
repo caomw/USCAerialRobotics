@@ -1,5 +1,5 @@
-//      test_feature_match.cpp
-//      Feature matching algorithm based on SURF and RANSAC (pyramid may be used in the future).
+//      feature_matching.cpp
+//      Feature matching algorithm based on SURF and RANSAC.
 //
 //      Copyright (C) 2011 Sam (Yujia Zhai) <yujia.zhai@usc.edu>
 //      Aerial Robotics Team, USC Robotics Society - http://www.uscrs.org - http://uscrs.googlecode.com
@@ -21,6 +21,7 @@
 
 // Super-accurate feature matching based on SURF, homography and Random Sample Consensus.
 // Could be improved by:
+//   using pyramid to have a better understanding of neighborhood,
 //   matching knn results instead of only the best, and
 //   inspecting the relationship between homography matrix and transformation matrix from point cloud SVD.
 
@@ -39,7 +40,7 @@ using namespace std;
 
 typedef cv::Mat Mat;
 
-class Test_Surf_Match
+class Feature_Matching
 {	
 	ros::NodeHandle nh;
 	ros::Subscriber sub_image;
@@ -55,13 +56,13 @@ class Test_Surf_Match
 	
   public:
 
-	Test_Surf_Match(ros::NodeHandle& _nh): nh(_nh), sub_image_count(0), img_src(cv::Size(640, 480), CV_8UC3), img_tgt(cv::Size(640, 480), CV_8UC3), img_result(cv::Size(640, 960), CV_8UC3)
+	Feature_Matching(ros::NodeHandle& _nh): nh(_nh), sub_image_count(0), img_src(cv::Size(640, 480), CV_8UC3), img_tgt(cv::Size(640, 480), CV_8UC3), img_result(cv::Size(640, 960), CV_8UC3)
 	{
-		sub_image = nh.subscribe("/usb_cam/image_raw", 10, &Test_Surf_Match::sub_image_callback, this);		
+		sub_image = nh.subscribe("/usb_cam/image_raw", 10, &Feature_Matching::sub_image_callback, this);		
 		cv::namedWindow("test_result");
 	}
 	
-	~Test_Surf_Match()
+	~Feature_Matching()
 	{
 		cv::destroyWindow("test_result");
 		img_src.release();
@@ -158,10 +159,10 @@ class Test_Surf_Match
 
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "test_surf_match");
+	ros::init(argc, argv, "test_feature_matching");
 	ros::NodeHandle nh;
 	
-	Test_Surf_Match test_surf_match(nh);
+	Feature_Matching feature_matching(nh);
 	
 	ros::spin();
 	return 0;
