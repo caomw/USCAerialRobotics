@@ -10,3 +10,5 @@
 
 * No private data.
   Imagine that you uploaded your password, so that everyone can see it but you cannot delete it.
+
+* Use "art_" as the beginning of the package name.
