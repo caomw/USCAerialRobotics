@@ -1,4 +1,4 @@
-//      timer.hpp
+//      art_common.hpp
 //      An inclusion of all art_helper headers.
 //
 //      Copyright (C) 2011 Sam (Yujia Zhai) <yujia.zhai@usc.edu>
