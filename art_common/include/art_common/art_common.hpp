@@ -22,6 +22,7 @@
 #ifndef _ART_COMMON_
 #define _ART_COMMON_
 
-#include "timer.hpp"
+#include "Timer.hpp"
+#include "SerialComm.hpp"
 
 #endif

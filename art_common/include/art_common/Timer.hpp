@@ -1,4 +1,4 @@
-//      timer.hpp
+//      Timer.hpp
 //      A class based on std::chrono for recording and desplaying elapsed time.
 //
 //      Copyright (C) 2011 Sam (Yujia Zhai) <yujia.zhai@usc.edu>
