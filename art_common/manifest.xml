@@ -1,0 +1,21 @@
+<package>
+  <description brief="art_common">
+
+     art_common
+
+  </description>
+  <author>sam</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/art_common</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  
+  <export>
+    <cpp cflags="-I${prefix}/include"
+    	 lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -lart_common"/>
+  </export>
+
+</package>
+
+
