@@ -1,0 +1,20 @@
+<package>
+  <description brief="tb_feature_matching">
+
+     tb_feature_matching
+
+  </description>
+  <author>sam</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/tb_feature_matching</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="opencv2"/>
+  <depend package="cv_bridge"/>
+  <depend package="sensor_msgs"/>
+  <depend package="art_common"/>
+
+</package>
+
+
