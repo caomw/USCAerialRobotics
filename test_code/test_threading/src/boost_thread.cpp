@@ -12,9 +12,6 @@ class boost_thread
 {	
   private:
 	ros::NodeHandle nh;
-	long value_original;
-	long value_thread;
-	boost::mutex mutex_value;
 	art::Timer t;
 	
   public:
@@ -24,12 +21,14 @@ class boost_thread
 		/// Output the number of cores in CPU.
 		cout << endl << "Number of threads can be in parallel: " << boost::thread::hardware_concurrency() << endl;
 		
-		cv::Mat img = cv::imread("test.jpg"); // A 600 (col) * 400 (row) image
+		cv::Mat img = cv::imread("test.jpg"); // A 600 (col) * 400 (row) image, should be put in the ~/ folder
 		
-		cv::Mat img1(img, cv::Rect(0, 0, 300, 200));
-		cv::Mat img2(img, cv::Rect(300, 0, 300, 200));
-		cv::Mat img3(img, cv::Rect(0, 200, 300, 200));
-		cv::Mat img4(img, cv::Rect(300, 200, 300, 200));
+		/// These sub-images need to have overlapping regions with each other,
+		/// so that enough information can be used to detect features on the boundaries.
+		cv::Mat img1(img, cv::Rect(0, 0, 320, 220));
+		cv::Mat img2(img, cv::Rect(280, 0, 320, 220));
+		cv::Mat img3(img, cv::Rect(0, 180, 320, 220));
+		cv::Mat img4(img, cv::Rect(280, 180, 320, 220));
 		cv::Mat features, features1, features2, features3, features4;
 		
 		/// Test the original function and show the time elapsed.
@@ -50,22 +49,24 @@ class boost_thread
 		t.echospan("Multi-threading");
 	}
 	
-	void original(cv::Mat _img, cv::Mat descriptors) // do 1 + 2 + 3 + ... + 9999 + 10000
+	void original(cv::Mat _img, cv::Mat descriptors)
 	{
 		cv::SurfFeatureDetector surf_feature_detector;
 		cv::SurfDescriptorExtractor surf_descriptor_extractor;
 		vector<cv::KeyPoint> keypoints;
 		surf_feature_detector.detect(_img, keypoints);
 		surf_descriptor_extractor.compute(_img, keypoints, descriptors);
+		cout << endl << "origianl " << descriptors.rows << endl;
 	}
 	
-	void threading(cv::Mat _img, cv::Mat descriptors) // do the same calc, but divided in four pieces
+	void threading(cv::Mat _img, cv::Mat descriptors)
 	{
 		cv::SurfFeatureDetector surf_feature_detector;
 		cv::SurfDescriptorExtractor surf_descriptor_extractor;
 		vector<cv::KeyPoint> keypoints;
 		surf_feature_detector.detect(_img, keypoints);
 		surf_descriptor_extractor.compute(_img, keypoints, descriptors);
+		cout << endl << "thread " << descriptors.rows << endl;
 	}
 	
 	~boost_thread()
