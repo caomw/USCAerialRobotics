@@ -1,0 +1,17 @@
+<package>
+  <description brief="arduino_pid">
+
+     arduino_pid
+
+  </description>
+  <author>art</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/arduino_pid</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="art_common"/>
+
+</package>
+
+
