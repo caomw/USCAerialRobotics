@@ -24,7 +24,7 @@ include_directories(include/art_common)
 #rosbuild_gensrv()
 
 #common commands for building c++ executables and libraries
-rosbuild_add_library(art_common src/timer.cpp)
+rosbuild_add_library(art_common src/timer.cpp src/serial_comm.cpp)
 #target_link_libraries(${PROJECT_NAME} another_library)
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
