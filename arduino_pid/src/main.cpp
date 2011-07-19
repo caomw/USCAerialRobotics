@@ -1,4 +1,4 @@
-#include <ros/ros.h>
+	#include <ros/ros.h>
 #include <art_common/serial_comm.hpp>
 
 using namespace std;
@@ -63,6 +63,7 @@ class ArduinoPID
 	
 	bool checkupdate()
 	{
+		if(! ros::ok()) return false;
 		for(int i = 0; i < 3; i++)
 		{
 			if(roll_d[i] != roll[i]) return true;
@@ -95,15 +96,15 @@ class ArduinoPID
 	
 	ArduinoPID(ros::NodeHandle& _nh): nh(_nh), rt(1), serial("/dev/ttyUSB0", 115200)
 	{
-		ros::Duration(2.0).sleep();
+		ros::Duration(3.0).sleep();
 		while(ros::ok())
 		{
 			getparams();
 			if(checkupdate())
 			{
-				rt.sleep();
 				setupdate();
 				printupdate();
+				rt.sleep();
 			}
 		}
 	}
