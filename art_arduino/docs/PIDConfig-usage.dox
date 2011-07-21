@@ -1,0 +1,18 @@
+\subsubsection usage Usage
+\verbatim
+<node name="pid_tuning" pkg="art_arduino" type="pid_tuning">
+  <param name="proll" type="double" value="0.0" />
+  <param name="iroll" type="double" value="0.0" />
+  <param name="droll" type="double" value="0.0" />
+  <param name="ppitch" type="double" value="0.0" />
+  <param name="ipitch" type="double" value="0.0" />
+  <param name="dpitch" type="double" value="0.0" />
+  <param name="pyaw" type="double" value="0.0" />
+  <param name="iyaw" type="double" value="0.0" />
+  <param name="dyaw" type="double" value="0.0" />
+  <param name="paltitude" type="double" value="0.0" />
+  <param name="ialtitude" type="double" value="0.0" />
+  <param name="daltitude" type="double" value="0.0" />
+</node>
+\endverbatim
+

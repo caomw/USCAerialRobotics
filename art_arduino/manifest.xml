@@ -1,14 +1,15 @@
 <package>
-  <description brief="arduino_pid">
+  <description brief="art_arduino">
 
-     arduino_pid
+     art_arduino
 
   </description>
   <author>art</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/arduino_pid</url>
+  <url>http://ros.org/wiki/art_arduino</url>
   <depend package="roscpp"/>
+  <depend package="dynamic_reconfigure"/>
   <depend package="std_msgs"/>
   <depend package="art_common"/>
 

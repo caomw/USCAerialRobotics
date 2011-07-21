@@ -1,0 +1,17 @@
+\subsubsection parameters ROS parameters
+
+Reads and maintains the following parameters on the ROS server
+
+- \b "~proll" : \b [double]  min: -10.0, default: 0.0, max: 10.0
+- \b "~iroll" : \b [double]  min: -10.0, default: 0.0, max: 10.0
+- \b "~droll" : \b [double]  min: -10.0, default: 0.0, max: 10.0
+- \b "~ppitch" : \b [double]  min: -10.0, default: 0.0, max: 10.0
+- \b "~ipitch" : \b [double]  min: -10.0, default: 0.0, max: 10.0
+- \b "~dpitch" : \b [double]  min: -10.0, default: 0.0, max: 10.0
+- \b "~pyaw" : \b [double]  min: -10.0, default: 0.0, max: 10.0
+- \b "~iyaw" : \b [double]  min: -10.0, default: 0.0, max: 10.0
+- \b "~dyaw" : \b [double]  min: -10.0, default: 0.0, max: 10.0
+- \b "~paltitude" : \b [double]  min: -10.0, default: 0.0, max: 10.0
+- \b "~ialtitude" : \b [double]  min: -10.0, default: 0.0, max: 10.0
+- \b "~daltitude" : \b [double]  min: -10.0, default: 0.0, max: 10.0
+
