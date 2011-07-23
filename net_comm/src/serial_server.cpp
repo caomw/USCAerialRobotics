@@ -10,6 +10,8 @@ bool set_hover_altitude(net_comm::SetHoverAltitude::Request  &req,
 {
   ROS_INFO("Set hover to z=%d.", req.alt);	
   // Send serial command to hover
+  ros::Duration(1).sleep();
+  // 
   return true;
 }
 
@@ -18,6 +20,8 @@ bool lift(net_comm::LiftOff::Request  &req,
 {
   ROS_INFO("Liftoff!");	
   // Send serial command to liftoff
+  ros::Duration(1).sleep();
+  //
   return true;
 }
 
@@ -26,6 +30,8 @@ bool land(net_comm::Land::Request  &req,
 {
   ROS_INFO("Landing.");	
   // Send serial command to land
+  ros::Duration(1).sleep();
+  //
   return true;
 }
 
