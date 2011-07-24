@@ -47,7 +47,9 @@ bool arm_motors(net_comm::ArmMotors::Request  &req,
 {
   ROS_INFO("Arming Motors.");	
   // Send serial command to arm motors
-  ros::Duration(1).sleep();
+  SerialComm serialComm("ttyUSB0", 115200);
+  int checksum = 2^1^0^0^0;
+  serialComm.write(strcat("21000", (char*)checksum));
   //
   return true;
 }
@@ -57,7 +59,9 @@ bool disarm_motors(net_comm::DisarmMotors::Request  &req,
 {
   ROS_INFO("Disarming Motors.");	
   // Send serial command to disarm motors
-  ros::Duration(1).sleep();
+  SerialComm serialComm("ttyUSB0", 115200);
+  int checksum = 2^0^0^0^0;
+  serialComm.write(strcat("20000", (char*)checksum));
   //
   return true;
 }
