@@ -5,7 +5,9 @@
 #include "net_comm/Land.h"
 #include "net_comm/ArmMotors.h"
 #include "net_comm/DisarmMotors.h"
+#include "net_comm/serial_comm.hpp"
 
+using namespace art;
 
 bool set_hover_altitude(net_comm::SetHoverAltitude::Request  &req,
                         net_comm::SetHoverAltitude::Response &res )
@@ -22,8 +24,11 @@ bool lift(net_comm::LiftOff::Request  &req,
 {
   ROS_INFO("Liftoff!");	
   // Send serial command to liftoff
-  ros::Duration(1).sleep();
-  //
+  
+  SerialComm serialComm("ttyUSB0", 115200);
+  int checksum = 3^60^0^0^0;
+  serialComm.write(strcat("360000", (char*)checksum));
+  
   return true;
 }
 
