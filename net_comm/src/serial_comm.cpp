@@ -1,4 +1,4 @@
-#include <art_common/serial_comm.hpp>
+#include <net_comm/serial_comm.hpp>
 
 using namespace std;
 
