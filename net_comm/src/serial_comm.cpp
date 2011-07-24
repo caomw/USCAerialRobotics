@@ -8,7 +8,12 @@ namespace art
 	{
 		/** try opening the port **/
 		fd = open(port, O_RDWR | O_NOCTTY | O_NDELAY);
-		if (fd < 0){ throw; return; }
+		if (fd < 0)
+		{ 
+			ROS_INFO("FAILED TO OPEN PORT");
+			throw; 
+			return; 
+		}
 
 		/** setup new configuration */
 		struct termios oldtio, newtio;
