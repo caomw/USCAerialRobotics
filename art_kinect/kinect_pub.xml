@@ -1,0 +1,3 @@
+<library path="lib/libart_kinect">
+  <class name="art_kinect/kinect_pub" type="art_kinect::KinectPub" base_class_type="nodelet::Nodelet"/>
+</library>
