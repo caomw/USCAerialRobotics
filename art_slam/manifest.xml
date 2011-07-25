@@ -1,21 +1,15 @@
 <package>
   <description brief="art_slam">
-    Simultaneous Localization and Mapping.
+
+     art_slam
+
   </description>
-  <author>Sam(Yujia Zhai)</author>
-  <license>GNU GPL 2</license>
+  <author>art</author>
+  <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://uscrs.googlecode.com</url>
+  <url>http://ros.org/wiki/art_slam</url>
   <depend package="roscpp"/>
-  <depend package="std_msgs"/>
-  <depend package="pcl"/>
-  <depend package="sensor_msgs" />
-  <depend package="geometry_msgs" />
-  <depend package="message_filters"/>
-  <depend package="nav_msgs" />
-  <depend package="tf" />
-  <depend package="opencv2"/>
-  <depend package="cv_bridge"/>
+
 </package>
 
 
