@@ -7,19 +7,22 @@
 #include <openni_camera/openni_depth_image.h>
 #include <sensor_msgs/Image.h>
 
+using namespace std;
+using namespace openni_wrapper;
+
 namespace art_kinect
 {
 	class KinectPub : public nodelet::Nodelet
 	{
 		ros::NodeHandle nh;
-		OpenNIDriver& driver;
 		boost::shared_ptr<openni_wrapper::OpenNIDevice> device;
 		ros::Publisher pub_image_gray, pub_depth_raw;
 		
 		virtual void onInit()
 		{
+			ROS_INFO("hi");	
 			nh = getMTNodeHandle();
-			driver = OpenNIDriver::getInstance();
+			OpenNIDriver& driver = OpenNIDriver::getInstance();
 			driver.updateDeviceList();
 			device = driver.getDeviceByIndex(0);
 			
@@ -35,11 +38,13 @@ namespace art_kinect
 			device->setDepthRegistration(true);
 			dynamic_cast<DeviceKinect*>(device.get())->setDebayeringMethod(ImageBayerGRBG::EdgeAwareWeighted);
 			
-			device->registerImageCallback(image_callback);
-			device->registerDepthCallback(depth_callback);
+			device->registerImageCallback(&KinectPub::image_callback, *this);
+			device->registerDepthCallback(&KinectPub::depth_callback, *this);
 			
 			device->startImageStream();
 			device->startDepthStream();
+
+			ROS_INFO("haha");	
 		}
 		
 		void image_callback(boost::shared_ptr<Image> image, void* cookie)
@@ -48,7 +53,7 @@ namespace art_kinect
 			sensor_msgs::ImagePtr msg = boost::make_shared<sensor_msgs::Image>();
 			msg->header.stamp = time_now;
 			msg->data.resize(76800);
-			image->fillGrayscale(320, 240, &gray_msg->data[0], 320);
+			image->fillGrayscale(320, 240, &msg->data[0], 320);
 			pub_image_gray.publish(msg);
 		}
 		
@@ -58,7 +63,7 @@ namespace art_kinect
 			sensor_msgs::ImagePtr msg = boost::make_shared<sensor_msgs::Image>();
 			msg->header.stamp = time_now;
 			msg->data.resize(153600);
-			image->fillDepthImageRaw(320, 240, (short*) &depth_msg->data[0], 640);
+			image->fillDepthImageRaw(320, 240, (short*) &msg->data[0], 640);
 			pub_depth_raw.publish(msg);
 		}
 	};

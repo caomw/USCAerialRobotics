@@ -10,7 +10,7 @@
   <url>http://ros.org/wiki/art_kinect</url>
   <depend package="roscpp"/>
   <depend package="openni_camera"/>
-    <depend package="nodelet"/>
+  <depend package="nodelet"/>
 
   <export>
     <nodelet plugin="${prefix}/kinect_pub.xml" />
