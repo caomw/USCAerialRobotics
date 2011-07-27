@@ -20,10 +20,9 @@ namespace art_kinect
 		image_transport::ImageTransport* it;
 		boost::shared_ptr<openni_wrapper::OpenNIDevice> device;
 		image_transport::Publisher pub_image, pub_depth;
-		ros::Time time_last_image, time_last_depth, time_now_image, time_now_depth;
-		ros::Duration delta_time;
 		sensor_msgs::Image msg_image, msg_depth;
-
+		bool skip_image, skip_depth;
+		
 		virtual void onInit()
 		{
 			/// Configure variables.
@@ -31,9 +30,8 @@ namespace art_kinect
 			it = new image_transport::ImageTransport(nh);
 			pub_image = it->advertise("/kinect/image", 10);
 			pub_depth = it->advertise("/kinect/depth", 10);
-			time_last_image = time_last_depth = ros::Time::now();
-			delta_time = ros::Duration(0.01);
-
+			skip_image = skip_depth = false;
+			
 			/// Configure image types. Set it as MONO8 type to fool the image_transport plugin.
 			msg_image.data.resize(76800); msg_image.width = 320; msg_image.height = 240; msg_image.step = 320;
 			msg_depth.data.resize(153600); msg_depth.width = 320; msg_depth.height = 480; msg_depth.step = 320;
@@ -64,30 +62,27 @@ namespace art_kinect
 		{
 			delete it;
 		}
-		
+
 		void image_callback(boost::shared_ptr<Image> image, void* cookie)
 		{
-			/// Check if the frequency is lower than required.
-			time_now_image = ros::Time::now();
-			if(time_now_image - time_last_depth < delta_time) return;
-			msg_image.header.stamp = time_last_image = time_now_image;
-			
-			/// Tell the image transport plugin that this is a 8-bit image.
-			image->fillGrayscale(320, 240, &msg_image.data[0], 320);
-			pub_image.publish(msg_image);
-			
+			if(!skip_image)
+			{
+				msg_image.header.stamp = ros::Time::now();
+				image->fillGrayscale(320, 240, &msg_image.data[0], 320);
+				pub_image.publish(msg_image);
+			}
+			skip_image = !skip_image;
 		}
 		
 		void depth_callback(boost::shared_ptr<DepthImage> image, void* cookie)
 		{
-			/// Check if the frequency is lower than required.
-			time_now_depth = ros::Time::now();
-			if(time_now_depth - time_last_depth < delta_time) return;
-			msg_depth.header.stamp = time_last_depth = time_now_depth;
-
-			/// Tell the image transport plugin that this is a 8-bit image.
-			image->fillDepthImageRaw(320, 240, (short*) &msg_depth.data[0], 640);
-			pub_depth.publish(msg_depth);
+			if(!skip_depth)
+			{
+				msg_depth.header.stamp = ros::Time::now();
+				image->fillDepthImageRaw(320, 240, (short*) &msg_depth.data[0], 640);
+				pub_depth.publish(msg_depth);
+			}
+			skip_depth = !skip_depth;
 		}
 	};
 }
