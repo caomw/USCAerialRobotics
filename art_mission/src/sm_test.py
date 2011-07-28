@@ -4,9 +4,9 @@ roslib.load_manifest('art_mission')
 import rospy
 import smach
 import smach_ros
-import net_comm.srv
 from subprocess import call
-from std_msgs.msg import String
+from time import sleep
+from lib_command import beohawk
 
 # Start up all your stuff here
 class Start(smach.State):
@@ -15,42 +15,27 @@ class Start(smach.State):
 
 	def execute(self, userdata):
 		rospy.loginfo('Starting up. Waiting for services.')
-		rospy.wait_for_service('/serializer/land')
-		rospy.wait_for_service('/serializer/lift_off')
-		rospy.wait_for_service('/serializer/set_hover_altitude')		
+		beohawk.arm_motors()
 		return 'ready'
 
 class LiftOff(smach.State):
 	def __init__(self):
 		smach.State.__init__(self, outcomes = ['succeeded', 'preempted', 'aborted'])
-		self.attempt = 0
-		self.max_attempts = 5
+
 	def execute(self, userdata):
-		try:
-			lift = rospy.ServiceProxy('/serializer/lift_off', net_comm.srv.LiftOff)
-			lift()
-		except rospy.ServiceException, e:
-			print "Service call failed: %s"%e
-			if self.attempt >= self.max_attempts:
-				return 'aborted'
-			else:
-				self.attempt += 1
-				return 'preempted'
-		
+		beohawk.lift_off()
 		return 'succeeded'
 
 class LiftingOff(smach.State):
 	def __init__(self):
 		smach.State.__init__(self, outcomes = ['succeeded', 'preempted', 'aborted'])
-		self.stub_altitude = 0
-		self.desired_altitude = 80
 			
 	def execute(self, userdata):
 		# Check altitude
-		if self.stub_altitude < self.desired_altitude:
-			self.stub_altitude += 1
+		if(beohawk.alt < beohawk.liftoff_altitude):
 			return 'preempted'
-		return 'succeeded'
+		else:
+			return 'succeeded'
 	
 class Hover(smach.State):
 	def __init__(self):
@@ -59,7 +44,7 @@ class Hover(smach.State):
 		
 	def execute(self, userdata):
 		# Remain for however long
-		if rospy.Time.now() < self.started_at + rospy.Duration(10):
+		if rospy.Time.now() < self.started_at + rospy.Duration(1):
 			return 'preempted'
 		return 'succeeded'
 
@@ -70,28 +55,15 @@ class Land(smach.State):
 		self.max_attempts = 5
 		
 	def execute(self, userdata):
-		try:
-			land = rospy.ServiceProxy('/serializer/land', net_comm.srv.Land)
-			land()
-		except rospy.ServiceException, e:
-			print "Service call failed: %s"%e
-			if self.attempt >= self.max_attempts:
-				return 'aborted'
-			else:
-				self.attempt += 1
-				return 'preempted'
-		
+		beohawk.land()
 		return 'succeeded'
 
 class Landing(smach.State):
 	def __init__(self):
 		smach.State.__init__(self, outcomes = ['succeeded', 'preempted', 'aborted'])
-		self.desired_altitude = 0
-		self.stub_altitude = 80
 	def execute(self, userdata):
 		# Check altitude
-		if self.stub_altitude > self.desired_altitude:
-			self.stub_altitude -= 1
+		if(beohawk.alt > beohawk.landed_altitude):
 			return 'preempted'
 		return 'succeeded'
 
@@ -101,6 +73,7 @@ class Landed(smach.State):
 		smach.State.__init__(self, outcomes = ['succeeded'])
 		
 	def execute(self, userdata):
+		beohawk.disarm_motors()
 		return 'succeeded'
 		
 		
