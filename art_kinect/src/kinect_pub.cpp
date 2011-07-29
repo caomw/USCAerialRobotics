@@ -7,37 +7,87 @@
 #include <openni_camera/openni_depth_image.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
-#include <image_transport/image_transport.h>
+#include <message_filters/subscriber.h>
+#include <message_filters/synchronizer.h>
+#include <message_filters/sync_policies/approximate_time.h>
+#include <opencv2/highgui/highgui.hpp>
+#include <art_kinect/KinectMsg.h>
 
 using namespace std;
 using namespace openni_wrapper;
 
 namespace art_kinect
 {
+	struct StampedImage
+	{
+		struct { ros::Time stamp; } header;
+		boost::shared_ptr<Image> image;
+	};
+	
+	struct StampedDepth
+	{
+		struct { ros::Time stamp; } header;
+		boost::shared_ptr<DepthImage> depth;
+	};
+}
+
+namespace ros
+{
+	namespace message_traits
+	{
+		template<>
+		struct TimeStamp<art_kinect::StampedImage>
+		{
+			static ros::Time value(const art_kinect::StampedImage& msg)
+			{
+				return msg.header.stamp;
+			}
+		};
+
+		template<>
+		struct TimeStamp<art_kinect::StampedDepth>
+		{
+			static ros::Time value(const art_kinect::StampedDepth& msg)
+			{
+				return msg.header.stamp;
+			}
+		};
+	}
+}
+
+namespace art_kinect
+{
 	class KinectPub : public nodelet::Nodelet
 	{
 		ros::NodeHandle nh;
-		image_transport::ImageTransport* it;
 		boost::shared_ptr<openni_wrapper::OpenNIDevice> device;
-		image_transport::Publisher pub_image, pub_depth;
-		sensor_msgs::Image msg_image, msg_depth;
-		bool skip_image, skip_depth;
-		
+		typedef message_filters::sync_policies::ApproximateTime<StampedImage, StampedDepth> SyncPolicy;
+		message_filters::Synchronizer<SyncPolicy> synchronizer;
+		ros::Publisher pub;
+		art_kinect::KinectMsg msg_pub;
+		cv::Mat mat_image, mat_depth;
+		string encode_format;
+		vector<int> encode_params;
+		uint8_t count_skip;
+
+	  public:
+		KinectPub(): synchronizer(SyncPolicy(10)), encode_format(".png") {}
+
+	  private:
 		virtual void onInit()
 		{
 			/// Configure variables.
 			nh = getMTNodeHandle();
-			it = new image_transport::ImageTransport(nh);
-			pub_image = it->advertise("/kinect/image", 10);
-			pub_depth = it->advertise("/kinect/depth", 10);
-			skip_image = skip_depth = false;
-			
-			/// Configure image types. Set it as MONO8 type to fool the image_transport plugin.
-			msg_image.data.resize(76800); msg_image.width = 320; msg_image.height = 240; msg_image.step = 320;
-			msg_depth.data.resize(153600); msg_depth.width = 320; msg_depth.height = 480; msg_depth.step = 320;
-			msg_image.encoding = sensor_msgs::image_encodings::MONO8;
-			msg_depth.encoding = sensor_msgs::image_encodings::MONO8;
-			
+			pub = nh.advertise<art_kinect::KinectMsg>("/kinect_msg", 10);
+			synchronizer.registerCallback(&KinectPub::callback_synchronizer, this);
+			mat_image.create(240, 320, CV_8UC1);
+			mat_depth.create(240, 320, CV_16UC1);
+			encode_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
+			encode_params.push_back(0);
+			msg_pub.image.data.reserve(76800);
+			msg_pub.depth.data.reserve(153600);
+			count_skip = 0;
+
 			/// Load and configure the Kinect device.
 			OpenNIDriver& driver = OpenNIDriver::getInstance();
 			driver.updateDeviceList();
@@ -58,31 +108,38 @@ namespace art_kinect
 			device->startDepthStream();
 		}
 
-		~KinectPub()
-		{
-			delete it;
-		}
-
 		void image_callback(boost::shared_ptr<Image> image, void* cookie)
 		{
-			if(!skip_image)
-			{
-				msg_image.header.stamp = ros::Time::now();
-				image->fillGrayscale(320, 240, &msg_image.data[0], 320);
-				pub_image.publish(msg_image);
-			}
-			skip_image = !skip_image;
+			ros::Time time_now = ros::Time::now();
+			boost::shared_ptr<StampedImage> msg_image = boost::make_shared<StampedImage>();
+			msg_image->header.stamp = time_now;
+			msg_image->image = image;
+			synchronizer.add<0>(msg_image);
 		}
 		
-		void depth_callback(boost::shared_ptr<DepthImage> image, void* cookie)
+		void depth_callback(boost::shared_ptr<DepthImage> depth, void* cookie)
 		{
-			if(!skip_depth)
+			ros::Time time_now = ros::Time::now();
+			boost::shared_ptr<StampedDepth> msg_depth = boost::make_shared<StampedDepth>();
+			msg_depth->header.stamp = time_now;
+			msg_depth->depth = depth;
+			synchronizer.add<1>(msg_depth);
+		}
+		
+		void callback_synchronizer(const boost::shared_ptr<StampedImage> msg_image, const boost::shared_ptr<StampedDepth> msg_depth)
+		{
+			if(count_skip == 3)
 			{
-				msg_depth.header.stamp = ros::Time::now();
-				image->fillDepthImageRaw(320, 240, (short*) &msg_depth.data[0], 640);
-				pub_depth.publish(msg_depth);
+				count_skip = 0;
+				msg_pub.image.header.stamp = msg_image->header.stamp;
+				msg_pub.depth.header.stamp = msg_depth->header.stamp;
+				msg_image->image->fillGrayscale(320, 240, &mat_image.data[0], 320);
+				msg_depth->depth->fillDepthImageRaw(320, 240, (short*) &mat_depth.data[0], 640);
+				cv::imencode(encode_format, mat_image, msg_pub.image.data, encode_params);
+				cv::imencode(encode_format, mat_depth, msg_pub.depth.data, encode_params);
+				pub.publish(msg_pub);
 			}
-			skip_depth = !skip_depth;
+			count_skip ++;
 		}
 	};
 }
