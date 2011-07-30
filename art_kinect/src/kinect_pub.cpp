@@ -128,7 +128,7 @@ namespace art_kinect
 		
 		void callback_synchronizer(const boost::shared_ptr<StampedImage> msg_image, const boost::shared_ptr<StampedDepth> msg_depth)
 		{
-			if(count_skip == 3)
+			if(count_skip == 2)
 			{
 				count_skip = 0;
 				msg_pub.image.header.stamp = msg_image->header.stamp;
