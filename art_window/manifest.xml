@@ -1,0 +1,19 @@
+<package>
+  <description brief="art_window">
+
+     art_window
+
+  </description>
+  <author>Rand</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/art_window</url>
+  <depend package="roscpp"/>
+  <depend package="pcl_visualization"/>
+  <depend package="pcl"/>
+  <depend package="pcl_ros"/>
+  <depend package="sensor_msgs"/>
+
+</package>
+
+
