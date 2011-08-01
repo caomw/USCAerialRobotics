@@ -1,4 +1,6 @@
 #include <ros/ros.h>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/point_cloud_conversion.h>
 // PCL specific includes
@@ -9,79 +11,71 @@
 #include <pcl/features/range_image_border_extractor.h>
 
 
-float angular_resolution = 0.5f;
+float angular_resolution = 0.3f;
 pcl::RangeImage::CoordinateFrame coordinate_frame = pcl::RangeImage::CAMERA_FRAME;
 bool setUnseenToMaxRange = false;
 ros::Publisher border_pub;
 
-void 
-cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
+int threshold1   = 100;
+int threshold2   = 200;
+int rho_res      = 1;
+int theta_res    = 5;
+int hough_thresh = 28;
+int min_length   = 60;
+int max_gap      = 45;
+
+void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 {
-  // ... do data processing
+}
 
-  sensor_msgs::PointCloud2 output;
-  std::cout << "Got Some Point Cloud Data" << std::endl;
-
-  // Convert the sensor_msgs/PointCloud2 data to pcl/PointCloud
-  pcl::PointCloud<pcl::PointXYZ> point_cloud;
-  pcl::fromROSMsg (*input, point_cloud);
-
-
-  // -----------------------------------------------
-  // -----Create RangeImage from the PointCloud-----
-  // -----------------------------------------------
-  float noise_level = 0.0;
-  float min_range = 0.0f;
-  int border_size = 1;
-  Eigen::Affine3f scene_sensor_pose (Eigen::Affine3f::Identity ());
-  boost::shared_ptr<pcl::RangeImage> range_image_ptr (new pcl::RangeImage);
-  pcl::RangeImage& range_image = *range_image_ptr;   
-  range_image.createFromPointCloud (point_cloud, angular_resolution, pcl::deg2rad (360.0f), pcl::deg2rad (180.0f),
-      scene_sensor_pose, coordinate_frame, noise_level, min_range, border_size);
-
-  // -------------------------
-  // -----Extract borders-----
-  // -------------------------
-  pcl::RangeImageBorderExtractor border_extractor (&range_image);
-  pcl::PointCloud<pcl::BorderDescription> border_descriptions;
-  border_extractor.compute (border_descriptions);
-
-  // ----------------------------------
-  // -----Show points in 3D viewer-----
-  // ----------------------------------
-  pcl::PointCloud<pcl::PointWithRange>::Ptr border_points_ptr(new pcl::PointCloud<pcl::PointWithRange>);
-  pcl::PointCloud<pcl::PointWithRange>::Ptr veil_points_ptr(new pcl::PointCloud<pcl::PointWithRange>);
-  pcl::PointCloud<pcl::PointWithRange>::Ptr shadow_points_ptr(new pcl::PointCloud<pcl::PointWithRange>);
-
-  //pcl::PointCloud<pcl::PointWithRange>& border_points = *border_points_ptr;
-  //pcl::PointCloud<pcl::PointWithRange>& veil_points   = *veil_points_ptr;
-  //pcl::PointCloud<pcl::PointWithRange>& shadow_points = *shadow_points_ptr;
-
-  sensor_msgs::PointCloud border_points;
-  for (int y=0; y< (int)range_image.height; ++y)
+void depthimg_cb (const sensor_msgs::ImageConstPtr& input)
+{
+  std::cout << "Got A Depth Image" << std::endl;
+  cv::Mat img;
+  img.create(input->height, input->width, CV_8UC1);
+  short* data_ptr = (short*)(&input->data[0]);
+  for(int i = 0; i <= input->height * input->width; i++)
   {
-    for (int x=0; x< (int)range_image.width; ++x)
-    {
-      if (border_descriptions.points[y*range_image.width + x].traits[pcl::BORDER_TRAIT__OBSTACLE_BORDER])
-      {
-        geometry_msgs::Point32 p;
-        p.x = range_image.points[y*range_image.width + x].x;
-        p.y = range_image.points[y*range_image.width + x].y;
-        p.z = range_image.points[y*range_image.width + x].z;
-        border_points.points.push_back (p);
-      }
-
-      //if (border_descriptions.points[y*range_image.width + x].traits[pcl::BORDER_TRAIT__VEIL_POINT])
-      //  veil_points.points.push_back (range_image.points[y*range_image.width + x]);
-      //if (border_descriptions.points[y*range_image.width + x].traits[pcl::BORDER_TRAIT__SHADOW_BORDER])
-      //  shadow_points.points.push_back (range_image.points[y*range_image.width + x]);
-    }
+    if(data_ptr[i] <= 2048/* threshold */)
+      img.data[i] = data_ptr[i] / 8;
+    else
+      img.data[i] = 0;
   }
 
+  cv::Mat morphImg;
 
-  sensor_msgs::PointCloud2 border_points_msg;
-  sensor_msgs::convertPointCloudToPointCloud2(border_points, border_points_msg);
-  border_pub.publish(border_points_msg);
+  cv::morphologyEx(img, morphImg, cv::MORPH_CLOSE, cv::Mat(), cv::Point(-1,-1), 5);
+
+  // Find the edges in the depth image
+  cv::Mat edges;
+  cv::Canny(morphImg, edges, threshold1, threshold2);
+
+
+  cv::Mat dispImg;
+  cv::cvtColor(edges, dispImg, CV_GRAY2BGR);
+
+  //use this edge image to find some straight lines using a probabalistic Hough transform
+  std::vector<cv::Vec4i> lines;
+  cv::HoughLinesP(edges, lines, std::max(0.1,double(rho_res)), std::max(0.1,theta_res * M_PI/180.0), std::max(1.0,double(hough_thresh)),
+    std::max(1, min_length), std::max(1, max_gap));
+  for( size_t i = 0; i < lines.size(); i++ )
+  {
+    if(lines[i][0] < 30 || lines[i][0] > img.cols-30) continue;
+    if(lines[i][1] < 30 || lines[i][1] > img.rows-30) continue;
+    if(lines[i][2] < 30 || lines[i][2] > img.cols-30) continue;
+    if(lines[i][3] < 30 || lines[i][3] > img.rows-30) continue;
+    cv::line(dispImg, cv::Point(lines[i][0], lines[i][1]), cv::Point(lines[i][2], lines[i][3]), cv::Scalar(rand()%255,rand()%255,rand()%255), 3, 8);
+  }
+
+  // Let's look for corners too!
+  std::vector<cv::Point2f> corners;
+  cv::goodFeaturesToTrack(edges, corners, 50, .50, 10);
+  for(int i=0; i<corners.size(); ++i)
+    cv::circle(dispImg, corners[i], 4, cv::Scalar(0, 0, 255));
+
+  cv::imshow("img", morphImg);
+  cv::imshow("edges", dispImg);
+  cv::waitKey(100);
 }
 
 int
@@ -91,9 +85,23 @@ main (int argc, char** argv)
   ros::init (argc, argv, "art_window");
   ros::NodeHandle nh;
 
+  cv::namedWindow("img");
+  cv::namedWindow("edges");
+  cv::createTrackbar("threshold1",      "edges", &threshold1,   255);
+  cv::createTrackbar("threshold2",      "edges", &threshold2,   255);
+  cv::createTrackbar("rho_res (pix)",   "edges", &rho_res,      255);
+  cv::createTrackbar("theta_res (deg)", "edges", &theta_res,    360);
+  cv::createTrackbar("min_length",      "edges", &min_length,   255);
+  cv::createTrackbar("max_gap",         "edges", &max_gap,      255);
+  cv::createTrackbar("hough thresh",    "edges", &hough_thresh, 255);
+
   // Create a ROS subscriber for the input point cloud
-  ros::Subscriber sub = nh.subscribe ("points", 1, cloud_cb);
+  ros::Subscriber points_sub = nh.subscribe ("/points", 1, cloud_cb);
+
+  ros::Subscriber img_sub = nh.subscribe ("/kinect/depth", 1, depthimg_cb);
+
   border_pub = nh.advertise<sensor_msgs::PointCloud2>("border_points", 1);
+
 
   // Spin
   ros::spin ();
