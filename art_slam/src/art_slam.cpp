@@ -1,58 +1,64 @@
+
+
 namespace art_slam
-{	
+{
+	KinectSLAM::KinectSLAM(): optimizer(3, 2)
+	{
+		initialize_gpu();
+	}
+	
+	KinectSLAM::~KinectSLAM()
+	{
+		for(int i = 0; i < nodes.size(); i++) delete nodes[i];
+	}
+	
 	virtual void KinectSLAM::onInit()
 	{
 		nh = getMTNodeHandle();
-		sub_image_gray = message_filters::Subscriber<sensor_msgs::Image>(nh, "/kinect/image_gray" , 10);
-		sub_depth_raw = message_filters::Subscriber<sensor_msgs::Image>(nh, "/kinect/depth_raw" , 10);
-		sub_sync = message_filters::Synchronizer<SyncPolicy>(SyncPolicy(10), sub_image_gray, sub_depth_raw);
-		sub_sync.registerCallback(boost::bind(&KinectSLAM::cb_sync_subs, this, _1, _2));
-		
-		optimizer = AISNavigation::HCholOptimizer3D(3, 2)
-		
-		initialize_gpu(); /// TODO
+		pub_poses = nh.advertise<geometry_msgs::PoseArray>("slam/poses", 10);
+		sub_kinect = nh.subscribe("/kinect/raw" , 10, cb_sub_kinect);
+	}
+
+	void initialize_gpu()
+	{
+		cv::gpu::GpuMat gpumat_temp(2, 2, CV_8UC1);
+		detector(gpumat_temp, cv::gpu::GpuMat(), vector<cv::Keypoint>());
+		matcher.match(gpumat_temp, gpumat_temp, vector<cv::DMatch>());
 	}
 	
-	~KinectSLAM()
+	void KinectSLAM::cb_sub_kinect(const art_kinect::KinectMsg::ConstPtr msg)
 	{
-		for(int i = 0; i < list_node.size(); i++) delete list_node[i];
-	}
-	
-	void KinectSLAM::cb_sync_subs(const sensor_msgs::Image::ConstPtr msg_image, const sensor_msgs::Image::ConstPtr msg_depth)
-	{
-		/// Create new node.
 		Node* node_new = new Node();
-		
-		/// Detect features and store them as keypoints.
-		cv::Mat image_temp(240, 320, CV_8UC1, (char*) &(msg_image->data[0])); /// TODO: find out why 240 x 320
-		detector(img_new, gpu::GpuMat(), node->keypoints);
-		
-		/// Get the 3D points of these features, filter out those without valid depth.
-		attach_depth_to_features_impl(node_new, msg_depth);
-		
-		/// Extract feature descriptors.
-		cv::Mat descriptors_temp;
-		extractor.compute(image_temp, node_new->keypoints, descriptors_temp);
-		node->descriptors.upload(descriptors_temp);
-		
-		if(list_node.size() > 0)
+		detector(cv::Mat(240, 320, CV_8UC1, msg->image), gpu::GpuMat(), node->keypoints);
+		attach_depth_to_features(node_new, msg->depth);
+		extractor.compute(image_temp, node_new->keypoints, descriptors);
+				
+		if(list_node.size() == 0)
 		{
+			node_new->id = nodes.size();
+			nodes.push_back(node_new);
+			/// TODO: analyze the groud surface and give the right initial orientation.
+			optimizer.addVertex(node_new->id, Transformation3(), 1e9 * Matrix6::eye(1.0));
+		}
+		else
+		{
+			Node* node_old = nodes.back();
 			/// Start RANSAC matching.
-			
 			Eigen::Matrix4f trafo;
 			vector<cv::DMatch> inliers;
 			double error;
-			RANSAC_3d_matching(node_new, list_node.back(), trafo, inliers, error);
+			match_node_descriptors(node_new, nodes.back(), inliers);			
+			get_inliers_ransac(node_new, node_old, trafo, inliers, error);
 			
-			
-						
-			/// Figure out which previous nodes to match.
-			
-			/// Match those previous.
-			
-			/// Filter out big trafo and add to the graph system.
-			
-			/// Optimize the graph.
+			/// If it's good node, add it to graph system, and then optimize the graph.
+			node_new->id = nodes.size();
+			nodes.push_back(node_new);
+			optimizer.addVertex(node_new->id, Transformation3(), 1e9 * Matrix6::eye(1.0));
+			optimizer.addEdge(optimizer->vertex(node_old->id), optimizer->vertex(node_new->id), eigen_to_hogman(trafo), Matrix6::eye(pow(inliers.size(), 2)));
+			optimizer.optimize(10, true);
+
+			/// Publish the pose array.
+			publish_poses_to_visualization(); 
 		}
 	}
 	
@@ -88,12 +94,15 @@ namespace art_slam
 		node->keypoints.resize(newsize);
 		node->points.conservativeResize(Eigen::NoChange, newsize);
 	}
-	
-	void KinectSLAM RANSAC_3d_matching(Node* node_new, Node* node_old, Eigen::Matrix4f& trafo, vector<cv::DMatch>& inliers, double& error)
+
+	void KinectSLAM::match_node_descriptors(Node* node_new, Node* node_old, vector<cv::DMatch>& matches)
 	{
-		vector<cv::DMatch> matches;
-		matcher.match(node_new->descriptors, list_node.back->descriptors, matches);
-		
+		cv::gpu::GpuMat gpumat_new(node_new->descriptors), gpumat_old(node_old->descriptors);
+		matcher.match(gpumat_new, gpumat_old, matches);
+	}
+	
+	void KinectSLAM::get_inliers_ransac(Node* node_new, Node* node_old, Eigen::Matrix4f& trafo, vector<cv::DMatch>& inliers, double& error)
+	{
 		/// Initialize variables and constants.
 		int min_inlier_threshold = initial_matches->size() >> 1;
 		static double max_error = xxxx; /// TODO
@@ -164,5 +173,27 @@ namespace art_slam
 			if(temp_error < error) { trafo = temp_trafo; inliers = temp_inliers; error = temp_error; }
 		}
 	}
-	
+
+	void publish_pose_to_visualization()
+	{
+		int poses_size = optimizer.vertices().size();
+		geometry_msgs::PoseArray poses;
+		poses.poses.resize(poses_size)
+		for(int i = 0; i < poses_size; i++)
+		{
+			geometry_msgs::Pose& pose = poses.poses[i];
+			_Vector<3, double>& t = optimizer.vertex(i)->transformation.translation();
+			_Vector<4, double>& r = optimizer.vertex(i)->transformation.rotation();
+			pose.point.x = t.x;
+			pose.point.y = t.y;
+			pose.point.z = t.z;
+			pose.orientation.x = r.x;
+			pose.orientation.y = r.y;
+			pose.orientation.z = r.z;
+			pose.orientation.w = r.w;
+		}
+		pub_poses.publish(poses);
+	}
 }
+
+PLUGINLIB_DECLARE_CLASS(art_slam, kinect_slam, art_slam::KinectSLAM, nodelet::Nodelet);

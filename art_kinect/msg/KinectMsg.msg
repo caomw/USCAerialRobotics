@@ -1,2 +1,4 @@
-sensor_msgs/Image image
-sensor_msgs/Image depth
+int32 id
+time stamp
+char[] image
+char[] depth

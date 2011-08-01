@@ -1,0 +1,4 @@
+#ifndef _ART_SLAM_HOGMAN_CONVERSIONS_
+#define _ART_SLAM_HOGMAN_CONVERSIONS_
+
+#endif

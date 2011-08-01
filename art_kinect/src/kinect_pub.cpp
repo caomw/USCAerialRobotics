@@ -5,8 +5,6 @@
 #include <openni_camera/openni_driver.h>
 #include <openni_camera/openni_image.h>
 #include <openni_camera/openni_depth_image.h>
-#include <sensor_msgs/Image.h>
-#include <sensor_msgs/image_encodings.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
@@ -71,23 +69,27 @@ namespace art_kinect
 		uint8_t count_skip;
 
 	  public:
-		KinectPub(): synchronizer(SyncPolicy(10)), encode_format(".png") {}
-
-	  private:
-		virtual void onInit()
+		KinectPub(): synchronizer(SyncPolicy(10)), encode_format(".png")
 		{
 			/// Configure variables.
-			nh = getMTNodeHandle();
-			pub = nh.advertise<art_kinect::KinectMsg>("/kinect_msg", 10);
-			synchronizer.registerCallback(&KinectPub::callback_synchronizer, this);
 			mat_image.create(240, 320, CV_8UC1);
 			mat_depth.create(240, 320, CV_16UC1);
 			encode_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
 			encode_params.push_back(0);
-			msg_pub.image.data.reserve(76800);
-			msg_pub.depth.data.reserve(153600);
+			msg_pub.id = -1;
+			msg_pub.image.reserve(76800);
+			msg_pub.depth.reserve(153600);
 			count_skip = 0;
+		}
 
+	  private:
+		virtual void onInit()
+		{
+			/// Configure publisher and synchronizer.
+			nh = getMTNodeHandle();
+			pub = nh.advertise<art_kinect::KinectMsg>("/kinect/compressed", 10);
+			synchronizer.registerCallback(&KinectPub::callback_synchronizer, this);
+			
 			/// Load and configure the Kinect device.
 			OpenNIDriver& driver = OpenNIDriver::getInstance();
 			driver.updateDeviceList();
@@ -102,13 +104,13 @@ namespace art_kinect
 			dynamic_cast<DeviceKinect*>(device.get())->setDebayeringMethod(ImageBayerGRBG::EdgeAwareWeighted);
 
 			/// Register callbacks and start the streams.
-			device->registerImageCallback(&KinectPub::image_callback, *this);
-			device->registerDepthCallback(&KinectPub::depth_callback, *this);
+			device->registerImageCallback(&KinectPub::cb_image, *this);
+			device->registerDepthCallback(&KinectPub::cb_depth, *this);
 			device->startImageStream();
 			device->startDepthStream();
 		}
 
-		void image_callback(boost::shared_ptr<Image> image, void* cookie)
+		void cb_image(boost::shared_ptr<Image> image, void* cookie)
 		{
 			ros::Time time_now = ros::Time::now();
 			boost::shared_ptr<StampedImage> msg_image = boost::make_shared<StampedImage>();
@@ -117,7 +119,7 @@ namespace art_kinect
 			synchronizer.add<0>(msg_image);
 		}
 		
-		void depth_callback(boost::shared_ptr<DepthImage> depth, void* cookie)
+		void cb_depth(boost::shared_ptr<DepthImage> depth, void* cookie)
 		{
 			ros::Time time_now = ros::Time::now();
 			boost::shared_ptr<StampedDepth> msg_depth = boost::make_shared<StampedDepth>();
@@ -130,13 +132,13 @@ namespace art_kinect
 		{
 			if(count_skip == 2)
 			{
+				msg_pub.id ++;
 				count_skip = 0;
-				msg_pub.image.header.stamp = msg_image->header.stamp;
-				msg_pub.depth.header.stamp = msg_depth->header.stamp;
+				msg_pub.stamp = msg_image->header.stamp; /// TODO
 				msg_image->image->fillGrayscale(320, 240, &mat_image.data[0], 320);
 				msg_depth->depth->fillDepthImageRaw(320, 240, (short*) &mat_depth.data[0], 640);
-				cv::imencode(encode_format, mat_image, msg_pub.image.data, encode_params);
-				cv::imencode(encode_format, mat_depth, msg_pub.depth.data, encode_params);
+				cv::imencode(encode_format, mat_image, msg_pub.image, encode_params);
+				cv::imencode(encode_format, mat_depth, msg_pub.depth, encode_params);
 				pub.publish(msg_pub);
 			}
 			count_skip ++;

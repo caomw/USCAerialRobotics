@@ -1,0 +1,18 @@
+<package>
+  <description brief="art_visualization">
+
+     art_visualization
+
+  </description>
+  <author>Sam Zhai</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/art_visualization</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="art_kinect"/>
+
+</package>
+
+
