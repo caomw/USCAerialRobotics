@@ -43,8 +43,9 @@ namespace art_kinect
 			mat_image = cv::imdecode(mat_buf_image, -1);
 			mat_depth = cv::imdecode(mat_buf_depth, -1);
 
+			/// TODO: Fool OpenCV.
 			memcpy(&msg_raw->image[0], (const char*) &mat_image.data[0], 76800);
-			memcpy(&msg_raw->depth[0], (const char*) &mat_image.data[0], 153600);
+			memcpy(&msg_raw->depth[0], (const char*) &mat_depth.data[0], 153600);
 			pub.publish(msg_raw);
 		}
 	};

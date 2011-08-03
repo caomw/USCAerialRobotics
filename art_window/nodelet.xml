@@ -1,0 +1,5 @@
+<library path="lib/libart_window">
+  <class name="art_window/window_localization" type="art_window::WindowLocalization" base_class_type="nodelet::Nodelet">
+  	<description> </description>
+  </class>
+</library>

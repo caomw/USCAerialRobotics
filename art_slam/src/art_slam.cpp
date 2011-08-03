@@ -1,4 +1,4 @@
-
+#include <art_slam/kinect_slam.hpp>
 
 namespace art_slam
 {
@@ -35,7 +35,7 @@ namespace art_slam
 				
 		if(list_node.size() == 0)
 		{
-			node_new->id = nodes.size();
+			node_new->id = 0;
 			nodes.push_back(node_new);
 			/// TODO: analyze the groud surface and give the right initial orientation.
 			optimizer.addVertex(node_new->id, Transformation3(), 1e9 * Matrix6::eye(1.0));
@@ -47,14 +47,14 @@ namespace art_slam
 			Eigen::Matrix4f trafo;
 			vector<cv::DMatch> inliers;
 			double error;
-			match_node_descriptors(node_new, nodes.back(), inliers);			
+			match_node_descriptors(node_new, node_old, inliers);			
 			get_inliers_ransac(node_new, node_old, trafo, inliers, error);
 			
 			/// If it's good node, add it to graph system, and then optimize the graph.
 			node_new->id = nodes.size();
 			nodes.push_back(node_new);
 			optimizer.addVertex(node_new->id, Transformation3(), 1e9 * Matrix6::eye(1.0));
-			optimizer.addEdge(optimizer->vertex(node_old->id), optimizer->vertex(node_new->id), eigen_to_hogman(trafo), Matrix6::eye(pow(inliers.size(), 2)));
+			optimizer.addEdge(optimizer->vertex(node_old->id), optimizer->vertex(node_new->id), cvt_eigen_to_hogman(trafo), Matrix6::eye(pow(inliers.size(), 2)));
 			optimizer.optimize(10, true);
 
 			/// Publish the pose array.

@@ -1,0 +1,6 @@
+<launch>
+    <node pkg="nodelet" type="nodelet" name="art_window_localization" args="load art_window/window_localization art_nodelet_manager" output="screen">
+    </node>
+    <node pkg="tf" type="static_transform_publisher" name="haha_tf_broadcaster1" args="0 0 0 0 0 0 /haha1 /world 100" />
+    <node pkg="tf" type="static_transform_publisher" name="haha_tf_broadcaster2" args="0 0 0 0 0 0 /haha2 /world 100" />
+</launch>

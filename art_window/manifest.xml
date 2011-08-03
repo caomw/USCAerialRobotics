@@ -10,10 +10,16 @@
   <url>http://ros.org/wiki/art_window</url>
   <depend package="opencv2"/>
   <depend package="roscpp"/>
+  <depend package="std_msgs"/>
   <depend package="pcl_visualization"/>
   <depend package="pcl"/>
   <depend package="pcl_ros"/>
   <depend package="sensor_msgs"/>
+  <depend package="nodelet"/>
+  <depend package="art_kinect"/>
+  <export>
+    <nodelet plugin="${prefix}/nodelet.xml" />
+  </export>
 
 </package>
 

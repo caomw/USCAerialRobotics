@@ -1,5 +1,0 @@
-<launch>
-	<node pkg="nodelet" type="nodelet" name="art_kinect_manager"  args="manager" output="screen"/>
-    <node pkg="nodelet" type="nodelet" name="art_kinect_node" args="load art_kinect/kinect_pub art_kinect_manager" output="screen">
-    </node>
-</launch>

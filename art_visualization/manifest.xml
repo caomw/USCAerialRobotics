@@ -12,6 +12,11 @@
   <depend package="std_msgs"/>
   <depend package="sensor_msgs"/>
   <depend package="art_kinect"/>
+  <depend package="nodelet"/>
+  
+  <export>
+    <nodelet plugin="${prefix}/nodelet.xml" />
+  </export>
 
 </package>
 

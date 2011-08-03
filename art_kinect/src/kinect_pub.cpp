@@ -140,6 +140,7 @@ namespace art_kinect
 				cv::imencode(encode_format, mat_image, msg_pub.image, encode_params);
 				cv::imencode(encode_format, mat_depth, msg_pub.depth, encode_params);
 				pub.publish(msg_pub);
+				count_skip == 0;
 			}
 			count_skip ++;
 		}

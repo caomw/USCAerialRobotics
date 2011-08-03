@@ -1,8 +1,12 @@
+#ifndef _ART_SLAM_KINECT_SLAM_
+#define _ART_SLAM_KINECT_SLAM_
+
 #include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
 #include <ros/ros.h>
 #include <hogman_minimal/graph_optimizer_hogman/graph_optimizer3d_hchol.h>
 #include <geometry_msgs/Pose.h>
+#include <art_slam/hogman_conversions.hpp>
 
 using namespace std;
 namespace AIS = AISNavigation;
@@ -52,3 +56,5 @@ namespace art_slam
 		~KinectSLAM();
 	}
 }
+
+#endif
