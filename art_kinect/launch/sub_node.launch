@@ -1,0 +1,4 @@
+<launch>
+	<node pkg="nodelet" type="nodelet" name="art_beobase_manager" args="manager" output="screen"/>
+    <node pkg="nodelet" type="nodelet" name="art_kinect_sub" args="load art_kinect/kinect_sub art_beobase_manager" output="screen"/>
+</launch>

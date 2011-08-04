@@ -2,7 +2,7 @@
 #include <nodelet/nodelet.h>
 #include <ros/ros.h>
 #include <opencv2/highgui/highgui.hpp>
-#include <art_kinect/KinectMsg.h>
+#include <art_common/KinectMsg.h>
 
 using namespace std;
 
@@ -27,13 +27,13 @@ namespace art_kinect
 		virtual void onInit()
 		{
 			nh = getMTNodeHandle();
-			pub = nh.advertise<art_kinect::KinectMsg>("/kinect/raw", 10);
+			pub = nh.advertise<art_common::KinectMsg>("/kinect/raw", 10);
 			sub = nh.subscribe("/kinect/compressed", 10, &KinectSub::cb_sub, this);
 		}
 
-		void cb_sub(const art_kinect::KinectMsg::ConstPtr& msg_compressed)
+		void cb_sub(const art_common::KinectMsg::ConstPtr& msg_compressed)
 		{
-			art_kinect::KinectMsg::Ptr msg_raw = boost::make_shared<art_kinect::KinectMsg>();
+			art_common::KinectMsg::Ptr msg_raw = boost::make_shared<art_common::KinectMsg>();
 			msg_raw->id = msg_compressed->id;
 			msg_raw->stamp = msg_compressed->stamp;
 			msg_raw->image.resize(76800); msg_raw->depth.resize(153600);

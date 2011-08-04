@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="nodelet" type="nodelet" name="kinect_slam" args="load art_slam/kinect_slam art_beobase_manager" output="screen"/>
+</launch>

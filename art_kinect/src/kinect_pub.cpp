@@ -9,7 +9,7 @@
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include <opencv2/highgui/highgui.hpp>
-#include <art_kinect/KinectMsg.h>
+#include <art_common/KinectMsg.h>
 
 using namespace std;
 using namespace openni_wrapper;
@@ -62,7 +62,7 @@ namespace art_kinect
 		typedef message_filters::sync_policies::ApproximateTime<StampedImage, StampedDepth> SyncPolicy;
 		message_filters::Synchronizer<SyncPolicy> synchronizer;
 		ros::Publisher pub;
-		art_kinect::KinectMsg msg_pub;
+		art_common::KinectMsg msg_pub;
 		cv::Mat mat_image, mat_depth;
 		string encode_format;
 		vector<int> encode_params;
@@ -87,7 +87,7 @@ namespace art_kinect
 		{
 			/// Configure publisher and synchronizer.
 			nh = getMTNodeHandle();
-			pub = nh.advertise<art_kinect::KinectMsg>("/kinect/compressed", 10);
+			pub = nh.advertise<art_common::KinectMsg>("/kinect/compressed", 10);
 			synchronizer.registerCallback(&KinectPub::callback_synchronizer, this);
 			
 			/// Load and configure the Kinect device.

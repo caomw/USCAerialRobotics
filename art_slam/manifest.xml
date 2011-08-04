@@ -9,7 +9,16 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/art_slam</url>
   <depend package="roscpp"/>
+  <depend package="nodelet"/>
+  <depend package="pcl"/>
+  <depend package="hogman_minimal"/>
+  <depend package="geometry_msgs"/>
+  <depend package="art_common"/>
+  <depend package="eigen"/>
 
+  <export>
+    <nodelet plugin="${prefix}/nodelet.xml" />
+  </export>
 </package>
 
 

@@ -1,5 +1,4 @@
 <launch>
-	<node pkg="nodelet" type="nodelet" name="art_beohawk_manager"  args="manager" output="screen"/>
-    <node pkg="nodelet" type="nodelet" name="art_kinect_pub args="load art_kinect/kinect_pub art_beohawk_manager" output="screen">
-    </node>
+	<node pkg="nodelet" type="nodelet" name="art_beohawk_manager" args="manager" output="screen"/>
+    <node pkg="nodelet" type="nodelet" name="art_kinect_pub args="load art_kinect/kinect_pub art_beohawk_manager" output="screen"/>
 </launch>
