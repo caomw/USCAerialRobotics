@@ -18,7 +18,7 @@ int standard_length = 85;
 using namespace std;
 namespace art_window
 {	
-	class WindowLocalization : public nodelet::Nodelet
+	class WindowPose : public nodelet::Nodelet
 	{
 		ros::NodeHandle nh;
 		ros::Subscriber sub_kinect;
@@ -57,7 +57,7 @@ namespace art_window
 			
 			pub_points = nh.advertise<sensor_msgs::PointCloud2>("/points", 10);
 			pub_pose = nh.advertise<geometry_msgs::Pose2D>("/arduino/robot_pose", 10);
-			sub_kinect = nh.subscribe("/kinect/raw", 10, &WindowLocalization::cb_sub_kinect, this);
+			sub_kinect = nh.subscribe("/kinect/raw", 10, &WindowPose::cb_sub_kinect, this);
 		}
 
 		void cb_sub_kinect(const art_common::KinectMsg::ConstPtr msg)
@@ -321,4 +321,4 @@ namespace art_window
 	};
 }
 
-PLUGINLIB_DECLARE_CLASS(art_window, window_localization, art_window::WindowLocalization, nodelet::Nodelet);
+PLUGINLIB_DECLARE_CLASS(art_window, window_pose, art_window::WindowPose, nodelet::Nodelet);
