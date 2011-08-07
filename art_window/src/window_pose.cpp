@@ -12,7 +12,7 @@
 #include <tf/transform_broadcaster.h>
 #include <sensor_msgs/PointCloud2.h>
 
-int standard_length = 85;
+int standard_length = 90;
 #define ToRad(x) x/180 * 3.1415926535
 
 using namespace std;
@@ -44,6 +44,11 @@ namespace art_window
 			float vector[3];
 		};
 
+		cv::Mat depth;
+		cv::Mat edges, edges_dilated;
+		cv::Mat buf1, buf2, buf3;
+		cv::Mat display1, display2;
+
 	  private:
 		virtual void onInit()
 		{
@@ -62,10 +67,6 @@ namespace art_window
 
 		void cb_sub_kinect(const art_common::KinectMsg::ConstPtr msg)
 		{
-			cv::Mat depth;
-			cv::Mat edges, edges_dilated;
-			cv::Mat buf1, buf2, buf3;
-			cv::Mat display1, display2;
 
 			/// Crop and threshold the image. Size: 200 (y,row) x 290 (x,col). Thresh: 5120;
 			{
@@ -108,14 +109,12 @@ namespace art_window
 						nl.length += pow(nl.point_a[j] - nl.point_b[j], 2);
 						nl.vector[j] = nl.point_b[j] - nl.point_a[j];
 					}
-
 					nl.length = sqrt(nl.length);
-					{
-						if((abs(nl.loc_a[0] - nl.loc_b[0]) > 20) && (abs(nl.loc_a[1] - nl.loc_b[1]) < 15))
-							lines_parallel.push_back(nl);
-						else if((abs(nl.loc_a[0] - nl.loc_b[0]) < 15) && (abs(nl.loc_a[1] - nl.loc_b[1]) > 20))
-							lines_vertical.push_back(nl);
-					}
+					
+					if((abs(nl.loc_a[0] - nl.loc_b[0]) > 20) && (abs(nl.loc_a[1] - nl.loc_b[1]) < 15))
+						lines_parallel.push_back(nl);
+					else if((abs(nl.loc_a[0] - nl.loc_b[0]) < 15) && (abs(nl.loc_a[1] - nl.loc_b[1]) > 20))
+						lines_vertical.push_back(nl);
 				}
 			}
 
@@ -127,83 +126,94 @@ namespace art_window
 			vector<Line> bottom_lines;
 			/// First, get the bottom line.
 			{
-				for(uint i = 0; i < lines_parallel.size(); i++)
-				{
-					if(nl.length > (target_length * 0.7) && nl.length < (target_length * 1.3))
-						bottom_lines.push_back(lines_parallel[i]);
-				}
+				bottom_lines = lines_parallel;
 			}
 
-			if(!found_bottom_line) return;
-
-			/// Then, get the left / right lines.
+			vector<Line> temp;
+			float target_length = static_cast<float>(standard_length) / 100;
+			for(int j = 0; j < bottom_lines.size(); j++)
 			{
-				float left_distance = 50, right_distance = 50;
+ROS_INFO("START");
+				found_left_line = false; found_right_line = false;
+				float left_distance = 40, right_distance = 40;
 				for(uint i = 0; i < lines_vertical.size(); i++)
 				{
 					float vertical_loc = (lines_vertical[i].loc_a[0] + lines_vertical[i].loc_b[0])/2;
-					if(abs(max(lines_vertical[i].loc_a[1], lines_vertical[i].loc_b[1]) - (bottom_line.loc_a[1] + bottom_line.loc_b[1])/2) < 40)
+					if(abs(max(lines_vertical[i].loc_a[1], lines_vertical[i].loc_b[1]) - (bottom_lines[j].loc_a[1] + bottom_lines[j].loc_b[1])/2) < 40)
 					{
-						if(vertical_loc < (bottom_line.loc_a[0] + 20))
+						if(vertical_loc < (bottom_lines[j].loc_a[0] + 40))
 						{
-							if((bottom_line.loc_a[0] - vertical_loc) < left_distance)
+							if((bottom_lines[j].loc_a[0] - vertical_loc) < left_distance)
 							{
 								found_left_line = true;
 								left_line = lines_vertical[i];
-								left_distance = bottom_line.loc_a[0] - vertical_loc;
+								left_distance = bottom_lines[j].loc_a[0] - vertical_loc;
 							}
 						}
-						else if(vertical_loc > (bottom_line.loc_b[0] - 20))
+						else if(vertical_loc > (bottom_lines[j].loc_b[0] - 40))
 						{
-							if((vertical_loc - bottom_line.loc_b[0]) < right_distance)
+							if((vertical_loc - bottom_lines[j].loc_b[0]) < right_distance)
 							{
 								found_right_line = true;
 								right_line = lines_vertical[i];
-								right_distance = vertical_loc - bottom_line.loc_b[0];
+								right_distance = vertical_loc - bottom_lines[j].loc_b[0];
 							}
 						}
 					}
 				}
-			}
 
-			
-			if(!(found_left_line && found_right_line)) return;			
-
-			cv::Vec4i final_line;
-			{
-				cv::Vec4i tl(bottom_line.loc_a[0], bottom_line.loc_a[1], bottom_line.loc_b[0], bottom_line.loc_b[1]);
-				cv::Vec4i ll(left_line.loc_a[0], left_line.loc_a[1], left_line.loc_b[0], left_line.loc_b[1]);
-				cv::Vec4i rl(right_line.loc_a[0], right_line.loc_a[1], right_line.loc_b[0], right_line.loc_b[1]);
-				
-				float a1 = static_cast<float>(tl[2] - tl[0]) / (tl[3] - tl[1]);
-				float b1 = static_cast<float>(tl[0]) - a1 * tl[1];
+				if(!(found_left_line && found_right_line)) continue;
+ROS_INFO("FOUND SIDE");
+				cv::Vec4i final_line;
 				{
-					float a2 = static_cast<float>(ll[2] - ll[0]) / (ll[3] - ll[1]);
-					float b2 = static_cast<float>(ll[0]) - a2 * ll[1];
-					float y = (b1 - b2) / (a2 - a1);
-					final_line[1] = static_cast<int>(y);
-					final_line[0] = static_cast<int>(a1 * y + b1);
+					cv::Vec4i tl(bottom_lines[j].loc_a[0], bottom_lines[j].loc_a[1], bottom_lines[j].loc_b[0], bottom_lines[j].loc_b[1]);
+					cv::Vec4i ll(left_line.loc_a[0], left_line.loc_a[1], left_line.loc_b[0], left_line.loc_b[1]);
+					cv::Vec4i rl(right_line.loc_a[0], right_line.loc_a[1], right_line.loc_b[0], right_line.loc_b[1]);
+					
+					float a1 = static_cast<float>(tl[2] - tl[0]) / (tl[3] - tl[1]);
+					float b1 = static_cast<float>(tl[0]) - a1 * tl[1];
+					{
+						float a2 = static_cast<float>(ll[2] - ll[0]) / (ll[3] - ll[1]);
+						float b2 = static_cast<float>(ll[0]) - a2 * ll[1];
+						float y = (b1 - b2) / (a2 - a1);
+						final_line[1] = static_cast<int>(y);
+						final_line[0] = static_cast<int>(a1 * y + b1);
+					}
+					{
+						float a2 = static_cast<float>(rl[2] - rl[0]) / (rl[3] - rl[1]);
+						float b2 = static_cast<float>(rl[0]) - a2 * rl[1];
+						float y = (b1 - b2) / (a2 - a1);
+						final_line[3] = static_cast<int>(y);
+						final_line[2] = static_cast<int>(a1 * y + b1);
+					}
 				}
+ROS_INFO("FOUND FINAL");
+				for(int i = 0; i < 4; i++) if(final_line[i] <= 0) continue;
+				if((final_line[0] >= 290) || (final_line[1] >= 200) || (final_line[2] >= 290) || (final_line[3] >= 200))
+					continue;
+ROS_INFO("PASS TEST");
+				Line real_line;
+
+				if(get_closest_loc(real_line.loc_a, depth, edges,  final_line[0], final_line[1], 20)
+					&& get_closest_loc(real_line.loc_b, depth, edges, final_line[2], final_line[3], 20))
 				{
-					float a2 = static_cast<float>(rl[2] - rl[0]) / (rl[3] - rl[1]);
-					float b2 = static_cast<float>(rl[0]) - a2 * rl[1];
-					float y = (b1 - b2) / (a2 - a1);
-					final_line[3] = static_cast<int>(y);
-					final_line[2] = static_cast<int>(a1 * y + b1);
+ROS_INFO("FOUND 2D POS");
+					get_3d_point(real_line.point_a, msg, real_line.loc_a[0], real_line.loc_a[1]);
+					get_3d_point(real_line.point_b, msg, real_line.loc_b[0], real_line.loc_b[1]);
+ROS_INFO("FOUND 3D POS");
+					real_line.length = 0;
+					for(int i = 0; i < 3; i++)
+					{
+						real_line.length += pow(real_line.point_a[i] - real_line.point_b[i], 2);
+					}
+					real_line.length = sqrt(real_line.length);
+					if((real_line.length > target_length * 0.7) && (real_line.length < target_length * 1.3))
+						temp.push_back(bottom_lines[j]);
 				}
+ROS_INFO("FOUND REAL");
 			}
 
-			for(int i = 0; i < 4; i++)
-			{
-				if(final_line[i] <= 0) return;
-			}
-			if(final_line[0] >= 290) return;
-			if(final_line[1] >= 200) return;
-			if(final_line[2] >= 290) return;
-			if(final_line[3] >= 200) return;
-			
-
-			Line real_line;
+			/*Line real_line;
 
 			if(get_closest_loc(real_line.loc_a, depth, edges,  final_line[0], final_line[1], 20)
 				&& get_closest_loc(real_line.loc_b, depth, edges, final_line[2], final_line[3], 20))
@@ -255,32 +265,35 @@ namespace art_window
 			pub_points.publish(points_msg);
 			
 			/// Plot.
+			*/
 
-			//cv::line(display2, cv::Point(bottom_line.loc_a[0], bottom_line.loc_a[1]), cv::Point(bottom_line.loc_b[0], bottom_line.loc_b[1]), cv::Scalar(255,0,0), 3, 8);
 			
-			cv::line(display1, cv::Point(final_line[0], final_line[1]), cv::Point(final_line[2], final_line[3]), cv::Scalar(255,0,0), 3, 8);
+			
+			//cv::line(display1, cv::Point(final_line[0], final_line[1]), cv::Point(final_line[2], final_line[3]), cv::Scalar(255,0,0), 3, 8);
 
-			cv::line(display1, cv::Point(left_line.loc_a[0], left_line.loc_a[1]), cv::Point(left_line.loc_b[0], left_line.loc_b[1]), cv::Scalar(0,255,0), 3, 8);
+			//cv::line(display1, cv::Point(left_line.loc_a[0], left_line.loc_a[1]), cv::Point(left_line.loc_b[0], left_line.loc_b[1]), cv::Scalar(0,255,0), 3, 8);
 
-			cv::line(display1, cv::Point(right_line.loc_a[0], right_line.loc_a[1]), cv::Point(right_line.loc_b[0], right_line.loc_b[1]), cv::Scalar(0,255,0), 3, 8);
+			//cv::line(display1, cv::Point(right_line.loc_a[0], right_line.loc_a[1]), cv::Point(right_line.loc_b[0], right_line.loc_b[1]), cv::Scalar(0,255,0), 3, 8);
 			
 
 			for(int i = 0; i < lines_vertical.size(); i++)
 			{
-				cv::line(display2, cv::Point(lines_vertical[i].loc_a[0], lines_vertical[i].loc_a[1]), cv::Point(lines_vertical[i].loc_b[0], lines_vertical[i].loc_b[1]), cv::Scalar(0,255,0), 3, 8);
+				cv::line(display2, cv::Point(lines_vertical[i].loc_a[0], lines_vertical[i].loc_a[1]), cv::Point(lines_vertical[i].loc_b[0], lines_vertical[i].loc_b[1]), cv::Scalar(0,255,0), 1, 8);
 			}
 
-			/*for(int i = 0; i < lines_parallel.size(); i++)
+			for(int i = 0; i < lines_parallel.size(); i++)
 			{
-				cv::line(display2, cv::Point(lines_parallel[i].loc_a[0], lines_parallel[i].loc_a[1]), cv::Point(lines_parallel[i].loc_b[0], lines_parallel[i].loc_b[1]), cv::Scalar(255,0,0), 3, 8);
-			}*/
-
-			for(int i = 0; i < bottom_lines.size(); i++)
-			{
-				cv::line(display2, cv::Point(bottom_lines[i].loc_a[0], bottom_lines[i].loc_a[1]), cv::Point(bottom_lines[i].loc_b[0], bottom_lines[i].loc_b[1]), cv::Scalar(255,0,0), 3, 8);
+				cv::line(display2, cv::Point(lines_parallel[i].loc_a[0], lines_parallel[i].loc_a[1]), cv::Point(lines_parallel[i].loc_b[0], lines_parallel[i].loc_b[1]), cv::Scalar(0,0,255), 1, 8);
 			}
 
-			cv::imshow("haha", display1);
+			for(int i = 0; i < temp.size(); i++)
+			{
+				cv::line(display2, cv::Point(temp[i].loc_a[0], temp[i].loc_a[1]), cv::Point(temp[i].loc_b[0], temp[i].loc_b[1]), cv::Scalar(255,0,0), 3, 8);
+			}
+
+			/*cv::line(display2, cv::Point(bottom_line.loc_a[0], bottom_line.loc_a[1]), cv::Point(bottom_line.loc_b[0], bottom_line.loc_b[1]), cv::Scalar(0,0,255), 3, 8);*/
+
+			//cv::imshow("haha", display1);
 			cv::imshow("ref", display2);
 			cv::waitKey(50);
 		}
@@ -300,16 +313,19 @@ namespace art_window
 			{
 				for(int j = blocksize; j >= - blocksize; j--)
 				{
-					if((edges.at<uchar>(y+j,x+i) == 255) && (depth.at<uchar>(y+j,x+i) != 0))
+					if((y+j < 200) && (y+j >= 0) && (x+i < 290) && (x+i > 0))
 					{
-						if((!found))
+						if((edges.at<uchar>(y+j,x+i) == 255) && (depth.at<uchar>(y+j,x+i) != 0))
 						{
-							found = true;
-							point[0] = i; point[1] = j; square = j*j+i*i; min_depth = depth.at<uchar>(y+j,x+i);
-						}
-						else if((depth.at<uchar>(y+j,x+i) < min_depth * 1.1) && (j*j+i*i < square))
-						{
-							point[0] = i; point[1] = j; square = j*j+i*i; min_depth = depth.at<uchar>(y+j,x+i);
+							if((!found))
+							{
+								found = true;
+								point[0] = i; point[1] = j; square = j*j+i*i; min_depth = depth.at<uchar>(y+j,x+i);
+							}
+							else if((depth.at<uchar>(y+j,x+i) < min_depth * 1.1) && (j*j+i*i < square))
+							{
+								point[0] = i; point[1] = j; square = j*j+i*i; min_depth = depth.at<uchar>(y+j,x+i);
+							}
 						}
 					}		
 				}

@@ -1,5 +1,5 @@
 <launch>
 	<node pkg="nodelet" type="nodelet" name="art_nodelet_manager" args="manager" output="screen"/>
-    <node pkg="nodelet" type="nodelet" name="art_window_localization" args="load art_window/window_localization art_nodelet_manager" output="screen"/>
+    <node pkg="nodelet" type="nodelet" name="art_window_pose" args="load art_window/window_pose art_nodelet_manager" output="screen"/>
     <!--<node pkg="tf" type="static_transform_publisher" name="haha_tf_broadcaster1" args="0 0 0 0 0 0 /hahaframe /world 100" />-->
 </launch>

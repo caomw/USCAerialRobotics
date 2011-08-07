@@ -1,5 +1,4 @@
 #include <ros/ros.h>
-#include <art_common/serial_comm.hpp>
 #include <dynamic_reconfigure/server.h>
 #include <art_arduino/PIDConfig.h>
 
@@ -10,18 +9,10 @@ class PIDTuning
 	ros::NodeHandle& nh;
 	dynamic_reconfigure::Server<art_arduino::PIDConfig> srv;
 	
-	union Packet
-	{
-		float pid_params[12];
-		char data[48];
-	};
 	
-	double pid_params[12];
-	art::SerialComm serial;
-	
-	void pid_callback(art_arduino::PIDConfig &config, uint32_t level)
+	void reconfigure_callback(art_arduino::PIDConfig &config, uint32_t level)
 	{
-		if(! ros::ok()) return;
+		if(!ros::ok()) return;
 
 		bool updated = false;
 		if(config.proll != pid_params[0]) { updated = true; pid_params[0] = config.proll; }
@@ -45,38 +36,12 @@ class PIDTuning
 		}
 	}
 	
-	void setupdate()
-	{
-		Packet p;
-		for(int i = 0; i < 12; i++) p.pid_params[i] = static_cast<float>(pid_params[i]);
-		serial.write(p.data, 48);
-	}
-	
-	void printupdate()
-	{
-		cout << endl << " - UPDATE - P I D - ";
-		cout << endl << "    Roll: \t";
-		for(int i = 0; i < 3; i ++)
-			cout << pid_params[i] << "\t";
-		cout << endl << "    Pitch: \t";
-		for(int i = 3; i < 6; i ++)
-			cout << pid_params[i] << "\t";
-		cout << endl << "    Yaw: \t";
-		for(int i = 6; i < 9; i ++)
-			cout << pid_params[i] << "\t";
-		cout << endl << " Altitude: \t";
-		for(int i = 9; i < 12; i ++)
-			cout << pid_params[i] << "\t";
-		cout << endl;
-	}
-	
   public:
-	
-	PIDTuning(ros::NodeHandle& _nh): nh(_nh), serial("/dev/ttyUSB0", 115200)
+	PIDTuning(ros::NodeHandle& _nh): nh(_nh)
 	{
 		ros::Duration(3.0).sleep();
 		dynamic_reconfigure::Server<art_arduino::PIDConfig>::CallbackType f;
-		f = boost::bind(&PIDTuning::pid_callback, this, _1, _2);
+		f = boost::bind(&PIDTuning::reconfigure_callback, this, _1, _2);
 		srv.setCallback(f);
 	}
 };
