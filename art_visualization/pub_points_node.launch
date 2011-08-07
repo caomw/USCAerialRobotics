@@ -1,0 +1,6 @@
+<launch>
+	<node pkg="nodelet" type="nodelet" name="art_beobase_manager" args="manager" output="screen"/>
+    <node pkg="nodelet" type="nodelet" name="art_window_localization" args="load art_visualization/pub_points art_beobase_manager" output="screen">
+    </node>
+	<node pkg="tf" type="static_transform_publisher" name="haha_tf_broadcaster" args="0 0 0 0 0 0 /hahaframe /world 100" />
+</launch>

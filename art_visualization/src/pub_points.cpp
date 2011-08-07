@@ -60,9 +60,11 @@ namespace art_visualization
 			}
 			sensor_msgs::PointCloud2 haha;
 			pcl::toROSMsg(pointcloud, haha);
-			haha.header.frame_id = "/world";
+			haha.header.frame_id = "/hahaframe";
 			haha.header.stamp = ros::Time::now();
 			pub.publish(haha);
+			
+			
 		}
 	};
 }

@@ -17,6 +17,7 @@
   <depend package="sensor_msgs"/>
   <depend package="nodelet"/>
   <depend package="art_kinect"/>
+  <depend package="art_common"/>
   <export>
     <nodelet plugin="${prefix}/nodelet.xml" />
   </export>
