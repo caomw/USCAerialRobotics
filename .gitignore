@@ -35,4 +35,5 @@ Thumbs.db
 
 # ROS Stuff
 build
+bin
 *.cfgc
