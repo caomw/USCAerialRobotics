@@ -5,6 +5,8 @@ ___USC Aerial Robotics___
 
 * No private data.
 
+* No files created by compilation, just source code.
+
 * Use "art_" as the beginning of the package name.
 
 * This is an edit
