@@ -15,15 +15,16 @@
 #include <message_filters/sync_policies/approximate_time.h>
 #include <math.h>
 #include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/PointCloud.h>
 #include <geometry_msgs/Vector3Stamped.h>
 
 using namespace std;
 
 const string LRFTopic = "scan";
-const string GyroTopic = "/gyro";
+const string GyroTopic = "angle";
 
 class LRF_Processor
-{t
+{
   public:
     ros::NodeHandle nh;
     message_filters::Subscriber<sensor_msgs::LaserScan> sub_lrf;
@@ -32,13 +33,14 @@ class LRF_Processor
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::LaserScan, 
                       geometry_msgs::Vector3Stamped> Policy_sync_subs;
     message_filters::Synchronizer<Policy_sync_subs> sync_subs;
+    ros::Publisher pub;
     
     LRF_Processor(ros::NodeHandle& _nh): nh(_nh),
         sub_lrf(nh, LRFTopic, 10),
         sub_gyro(nh, GyroTopic, 10),
         sync_subs(Policy_sync_subs(10),sub_lrf, sub_gyro)
     {
-        cout << "test";
+        pub = _nh.advertise<sensor_msgs::PointCloud>("/lrf/PointCloud", 5);
         sync_subs.registerCallback(boost::bind(&LRF_Processor::sync_subs_callback, this, _1, _2));
         sub_lrf.registerCallback(&LRF_Processor::sub_lrf_callback, this);
     }
@@ -46,14 +48,12 @@ class LRF_Processor
     void sub_lrf_callback(const sensor_msgs::LaserScan::ConstPtr& _msg_lrf)
     {
 	  float min = _msg_lrf->angle_min;
-      for (unsigned int i = 0; i < sizeof(_msg_lrf->ranges)/sizeof(_msg_lrf->ranges.at(0)); i++){
-        float angle = min + _msg_lrf->angle_increment;
+      for (uint32_t i = 0; i < _msg_lrf->ranges.size(); i++){
+        float angle = min + i * _msg_lrf->angle_increment;
         float range = _msg_lrf->ranges[i];
-        float mid_angle = (min + _msg_lrf->angle_max) / 2;
-        cout << angle << '\t' << range << endl;
-        float x_coord = range * sin(mid_angle - angle);
-        float y_coord = range * cos(mid_angle - range);
-        cout << "\t\t\t\t\t(" << x_coord << ", " << y_coord << endl;
+        float x_coord = range * sin(0 - angle);
+        float y_coord = range * cos(0 - angle);
+        cout << angle << '\t' << x_coord << y_coord << endl;
       }
 	}
     
@@ -67,21 +67,29 @@ class LRF_Processor
                             )
     {
       float min = _msg_lrf->angle_min;
-      for (unsigned int i = 0; i < sizeof(_msg_lrf->ranges)/sizeof(_msg_lrf->ranges.at(0)); i++){
-        float angle = min + _msg_lrf->angle_increment;
+      sensor_msgs::PointCloud cloud;
+      cloud.points[_msg_lrf->ranges.size()];
+      cloud.channels[_msg_lrf->ranges.size()];
+      
+      for (uint32_t i = 0; i < _msg_lrf->ranges.size(); i++){
+        float angle = min + i * _msg_lrf->angle_increment;
         float range = _msg_lrf->ranges[i];
-        float mid_angle = (min + _msg_lrf->angle_max) / 2;
         cout << angle << '\t' << range << endl;
         float x_pitch = _msg_gyro->vector.x;
         float y_roll = _msg_gyro->vector.y;
-        double x_coord = range * sin(mid_angle - angle);
-        double y_coord = range * cos(mid_angle - range);
+        double x_coord = range * sin(0 -angle);
+        double y_coord = range * cos(0 - range);
         cout << "\t\t\t\t\t(" << x_coord << ", " << y_coord << endl;
         double z_displacement = x_coord * sin(x_pitch);
+        double z_displacement2 = y_coord * sin(y_roll);
         x_coord *= cos(x_pitch);
         y_coord *= cos(y_roll);
+        cloud.points[i].x = x_coord;
+        cloud.points[i].y = y_coord;
+        cloud.points[i].z = z_displacement;
         
       }
+      pub.publish(cloud);
     }
 };
 
