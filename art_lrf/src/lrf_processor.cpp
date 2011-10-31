@@ -21,7 +21,7 @@
 using namespace std;
 
 const string LRFTopic = "scan";
-const string GyroTopic = "/gyro";
+const string GyroTopic = "angle";
 
 class LRF_Processor
 {
@@ -49,12 +49,11 @@ class LRF_Processor
     {
 	  float min = _msg_lrf->angle_min;
       for (uint32_t i = 0; i < _msg_lrf->ranges.size(); i++){
-        float angle = min + _msg_lrf->angle_increment;
+        float angle = min + i * _msg_lrf->angle_increment;
         float range = _msg_lrf->ranges[i];
-        cout << angle << '\t' << range << endl;
         float x_coord = range * sin(0 - angle);
         float y_coord = range * cos(0 - angle);
-        cout << "\t\t\t\t\t(" << x_coord << ", " << y_coord << endl;
+        cout << angle << '\t' << x_coord << y_coord << endl;
       }
 	}
     
@@ -73,7 +72,7 @@ class LRF_Processor
       cloud.channels[_msg_lrf->ranges.size()];
       
       for (uint32_t i = 0; i < _msg_lrf->ranges.size(); i++){
-        float angle = min + _msg_lrf->angle_increment;
+        float angle = min + i * _msg_lrf->angle_increment;
         float range = _msg_lrf->ranges[i];
         cout << angle << '\t' << range << endl;
         float x_pitch = _msg_gyro->vector.x;
