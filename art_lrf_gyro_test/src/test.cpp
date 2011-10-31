@@ -10,7 +10,7 @@ void hahacallback (const geometry_msgs::Vector3::ConstPtr& msg)
 {
   geometry_msgs::Vector3Stamped vec;
   vec.vector = *msg;
-  vector.header.stamp = ros::Time::now();
+  vec.header.stamp = ros::Time::now();
   pub.publish(vec);
   
   static tf::TransformBroadcaster br;
@@ -24,7 +24,7 @@ int main (int argc, char** argv)
 {
   ros::init(argc, argv, "abcdefg");
   ros::NodeHandle nh;
-  pub = nh.publish<geometry_msgs::Vector3Stamped>("/angle", 10);
+  pub = nh.advertise<geometry_msgs::Vector3Stamped>("/angle", 10);
   ros::Subscriber sub = nh.subscribe("/haha", 10, hahacallback);
   ros::spin();
   return 0;
