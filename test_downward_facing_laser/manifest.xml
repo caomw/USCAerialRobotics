@@ -1,0 +1,18 @@
+<package>
+  <description brief="test_downward_facing_laser">
+
+     test_downward_facing_laser
+
+  </description>
+  <author>Aerial Robotics</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/test_downward_facing_laser</url>
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="cv_bridge"/>
+
+</package>
+
+
