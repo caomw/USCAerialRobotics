@@ -21,7 +21,7 @@
 using namespace std;
 
 const string LRFTopic = "scan";
-const string GyroTopic = "angle";
+const string GyroTopic = "/angle";
 
 class LRF_Processor
 {
@@ -42,7 +42,7 @@ class LRF_Processor
     {
         pub = _nh.advertise<sensor_msgs::PointCloud>("/lrf/PointCloud", 5);
         sync_subs.registerCallback(boost::bind(&LRF_Processor::sync_subs_callback, this, _1, _2));
-        sub_lrf.registerCallback(&LRF_Processor::sub_lrf_callback, this);
+        //sub_lrf.registerCallback(&LRF_Processor::sub_lrf_callback, this);
     }
     
     void sub_lrf_callback(const sensor_msgs::LaserScan::ConstPtr& _msg_lrf)
@@ -53,7 +53,7 @@ class LRF_Processor
         float range = _msg_lrf->ranges[i];
         float x_coord = range * sin(0 - angle);
         float y_coord = range * cos(0 - angle);
-        cout << angle << '\t' << x_coord << y_coord << endl;
+        cout << angle << '\t' << x_coord << '\t' << y_coord << endl;
       }
 	}
     
@@ -68,27 +68,25 @@ class LRF_Processor
     {
       float min = _msg_lrf->angle_min;
       sensor_msgs::PointCloud cloud;
-      cloud.points[_msg_lrf->ranges.size()];
-      cloud.channels[_msg_lrf->ranges.size()];
-      
+      cloud.header.frame_id = "/world";
+      cloud.points.resize(_msg_lrf->ranges.size());
       for (uint32_t i = 0; i < _msg_lrf->ranges.size(); i++){
         float angle = min + i * _msg_lrf->angle_increment;
         float range = _msg_lrf->ranges[i];
-        cout << angle << '\t' << range << endl;
         float x_pitch = _msg_gyro->vector.x;
         float y_roll = _msg_gyro->vector.y;
         double x_coord = range * sin(0 -angle);
-        double y_coord = range * cos(0 - range);
-        cout << "\t\t\t\t\t(" << x_coord << ", " << y_coord << endl;
+        double y_coord = range * cos(0 - angle);
         double z_displacement = x_coord * sin(x_pitch);
         double z_displacement2 = y_coord * sin(y_roll);
         x_coord *= cos(x_pitch);
         y_coord *= cos(y_roll);
+        cout << x_coord << '\t' << y_coord << '\t' << z_displacement << " or " << z_displacement2 << endl;
+		
         cloud.points[i].x = x_coord;
         cloud.points[i].y = y_coord;
         cloud.points[i].z = z_displacement;
-        
-      }
+        }
       pub.publish(cloud);
     }
 };
@@ -98,7 +96,6 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "processor");
   ros::NodeHandle nh;
   
-  cout << "test";
   LRF_Processor lrf_processor(nh);
   ros::Rate loop_rate(10);
   
