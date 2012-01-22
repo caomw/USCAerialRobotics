@@ -22,6 +22,7 @@ using namespace std;
 
 const string LRFTopic = "scan";
 const string GyroTopic = "/angle";
+const double height = 6;
 
 class LRF_Processor
 {
@@ -81,12 +82,16 @@ class LRF_Processor
         double z_displacement2 = y_coord * sin(y_roll);
         x_coord *= cos(x_pitch);
         y_coord *= cos(y_roll);
-        cout << x_coord << '\t' << y_coord << '\t' << z_displacement << " or " << z_displacement2 << endl;
+        cout << i << '\t' <<  x_coord << '\t' << y_coord << '\t' << z_displacement << " or " << z_displacement2 << endl;
 		
         cloud.points[i].x = x_coord;
         cloud.points[i].y = y_coord;
         cloud.points[i].z = z_displacement;
-        }
+        if (z_displacement - height < 0.1 && z_displacement - height > -0.1){
+			cout << "suspected error" << endl;
+			cloud.channel.name = "error";
+		}
+      }
       pub.publish(cloud);
     }
 };
