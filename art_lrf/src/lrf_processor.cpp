@@ -20,7 +20,7 @@
 
 using namespace std;
 
-const string LRFTopic = "scan";
+const string LRFTopic = "/scan";
 const string GyroTopic = "/angle";
 const double height = 6;
 
