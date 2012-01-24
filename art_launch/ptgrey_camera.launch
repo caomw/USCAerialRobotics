@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="camera1394" type="camera1394_node" name="camera1394_node" />
+  <node pkg="image_proc" type="image_proc" name="image_proc" ns="/camera" />
+
+</launch>
