@@ -10,6 +10,9 @@
   <url>http://ros.org/wiki/art_vision</url>
   <depend package="roscpp"/>
   <depend package="std_msgs"/>
+  <depend package="geometry_msgs"/>
+  <depend package="message_filters"/>
+  <depend package="sensor_msgs"/>
 
 </package>
 
