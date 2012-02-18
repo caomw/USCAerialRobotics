@@ -10,6 +10,8 @@
 #include <opencv2/video/video.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+using namespace std;
+
 class Rectify3D {
   ros::NodeHandle nh;
   message_filters::Subscriber<sensor_msgs::Image> sub_image_raw;
@@ -21,15 +23,17 @@ class Rectify3D {
  public:
   Rectify3D (ros::NodeHandle& _nh): nh(_nh),
                                     sub_image_raw(nh, "/camera/image_mono", 10),
-                                    sub_rotation(nh, "/angle", 10) {
-    sync_subs.registerCallback(boost::bind(&Rectify3D::callback_sync_subs, this));
+                                    sub_rotation(nh, "/angle", 10),
+                                    sync_subs(Policy_sync_subs(10), sub_image_raw, sub_rotation)
+  {
+    sync_subs.registerCallback(boost::bind(&Rectify3D::callback_sync_subs, this, _1, _2));
   }
 
-  void callback_sync_subs (const sensor_msgs::Image::ConstPtr msg_image_raw,
-                           const geometry_msgs::Vector3Stamped::ConstPtr msg_rotation) {
+  void callback_sync_subs (const sensor_msgs::Image::ConstPtr& msg_image_raw,
+                           const geometry_msgs::Vector3Stamped::ConstPtr& msg_rotation) {
     
     cv::Mat image_now;
-    cv::resize(src, cv::Mat(480, 640, CV_8UC1, (char*) msg_image_raw->data[0]), image_now, cv::Size(240, 320));
+    cv::resize(cv::Mat(480, 640, CV_8UC1, (char*) msg_image_raw->data[0]), image_now, cv::Size(240, 320));
 
     // Get features from image.
     vector<cv::Point> points_now;
