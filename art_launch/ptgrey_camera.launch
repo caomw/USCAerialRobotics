@@ -5,4 +5,19 @@
   </node>
   <node pkg="image_proc" type="image_proc" name="image_proc" ns="/camera" />
 
+  <!-- config:
+
+  1. add yourself to group
+     groupadd -f #groupname#
+     usermod -a -G #groupname# #username#
+  
+  2. change udev file
+     vim /etc/udev/rules.d/xxxxx.rules
+     put new line:
+     SUBSYSTEM=="usb", ACTION=="add", ATTR{idVendor}=="Point_Gray_Research" GROUP="#groupname#"
+
+  3. /etc/init.d/udev restart
+  -->
+     
+
 </launch>
