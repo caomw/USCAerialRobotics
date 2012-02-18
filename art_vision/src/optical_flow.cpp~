@@ -48,7 +48,7 @@ class OpticalFlow
       //cv::solvePnPRansac(*points_old, *points_new, cv::eye(3), null, rvec, tvec);
       
       // Print output.
-      if (counter_sub_rawimage % 10 == 1) image_result = cv::Mat(240, 320, CV_8UC1, cv::Scalar(0));
+      if (counter_sub_rawimage % 10 == 0) image_result = cv::Mat(240, 320, CV_8UC1, cv::Scalar(0));
       for (size_t i = 0; i < status.size(); i++)
       {
         if (status[i] == 0) continue;
