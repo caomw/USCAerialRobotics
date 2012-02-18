@@ -21,7 +21,7 @@ using cv::Mat;
 using namespace Eigen;
 
 class Downward_Lasers
-{	
+{
   public:
 	ros::NodeHandle nh;
 	ros::Subscriber sub_image;
@@ -223,14 +223,46 @@ class Downward_Lasers
 		_img = cv_image_ptr->image;
 	}
 	
+	vector<cv::Point> orderPoints(vector4f p, vector4f q, vector<cv::Point> laserPoints)
+	{
+		/*vector<cv::Point> pqPoints;
+		for(int i = 0; i < 4; i++)
+		{
+			pqPoints.push_back(cv::Point(p(i), q(i)));
+		}*/
+		vector<cv::Point> orderedPoints = vector<cv::Point>(4);
+		
+		for(int i = 0; i < 4; i++)
+		{
+			float minAngle = 180;
+			for(int j = 0; j < 4; j++)
+			{
+				vector2f pq << p(i), q(i);
+				vector2f xy << laserPoints[j].x, laserPoints[j].y;
+				float dotProduct;
+				float angle;
+				
+				dotProduct = pq.dot(xy);
+				angle = acos(dotProduct);
+				
+				if(angle < minAngle) {
+					minAngle = angle;
+					orderedPoints[i] = laserPoints[j];
+				}
+			}
+		}
+		
+		return orderedPoints;
+	}
+	
 	void planeFinder(cv::Point* points[])
 	{
 		vector<cv::Point> sorted_points; // = new vector<cv::Point>();
 		vector<cv::Point> points_vector; // = new vector<cv::Point>();
-		
-		
+	
+	
 		//begin simple by x point sort
-		
+
 		//vector<Point> fixed_laser_points;
 		vector<int> xCoords; // = new vector<int>();
 		vector<int> yCoords; // = new vector<int>();
@@ -245,6 +277,7 @@ class Downward_Lasers
 			yCoords.push_back(points_vector[i].y);
 		}
 		
+		/*
 		std::sort(xCoords.begin(), xCoords.end());
 		std::sort(yCoords.begin(), yCoords.end());
 		
@@ -260,6 +293,9 @@ class Downward_Lasers
 				}
 			}
 		}
+		*/
+		
+		//sorted_points = orderPoints(/* */);	//p and q must be defined
 		
 		std::cout << "SORTED POINTS:  " << std::endl;
 		for(int i = 0 ; i < sorted_points.size(); i++)
@@ -268,7 +304,7 @@ class Downward_Lasers
 		}
 		std::cout << std::endl;
 		
-		//end somple sort by x
+		//end point Sort
 		
 		
 		//eig
@@ -288,6 +324,8 @@ class Downward_Lasers
 		Vector4f p(1, -1, 0, 0);
 		Vector4f q(0, 0, 1, -1);
 		
+		sorted_points = orderPoints(p, q, points_vector);
+		
 		Vector2f a;
 		Vector2f b;
 		Matrix<float, 2, 2> D;
@@ -296,11 +334,11 @@ class Downward_Lasers
 		Matrix<float, 4, 3> A;
 		Matrix<float, 3, 2> A2;
 		
-		
 		Vector3f w;
 		
 		p.transposeInPlace();
 		q.transposeInPlace();
+		
 		
 		for(int i = 0; i < 4; i++)
 		{
