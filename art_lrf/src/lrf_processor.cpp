@@ -76,17 +76,20 @@ class LRF_Processor
         float range = _msg_lrf->ranges[i];
         float x_pitch = _msg_gyro->vector.x;
         float y_roll = _msg_gyro->vector.y;
-        double x_coord = range * sin(0 -angle);
+        double x_coord = range * sin(0 - angle);
         double y_coord = range * cos(0 - angle);
-        double z_displacement = x_coord * sin(x_pitch);
-        double z_displacement2 = y_coord * sin(y_roll);
+        
         x_coord *= cos(x_pitch);
         y_coord *= cos(y_roll);
+        //These two calculations aren't quite correct.
+        //double z_displacement = x_coord * sin(y_roll);
+        //double z_displacement2 = y_coord * sin(x_pitch);
+        double z_displacement3 = range * sin(y_roll) * sin(x_pitch);
         cout << i << '\t' <<  x_coord << '\t' << y_coord << '\t' << z_displacement << " or " << z_displacement2 << endl;
 		
         cloud.points[i].x = x_coord;
         cloud.points[i].y = y_coord;
-        cloud.points[i].z = z_displacement;
+        cloud.points[i].z = 0.5;
         if (z_displacement - height < 0.1 && z_displacement - height > -0.1){
 			cout << "suspected error" << endl;
 			//cloud.channel.name = "error";
