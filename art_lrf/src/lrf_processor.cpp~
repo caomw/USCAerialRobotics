@@ -89,7 +89,7 @@ class LRF_Processor
         cloud.points[i].z = z_displacement;
         if (z_displacement - height < 0.1 && z_displacement - height > -0.1){
 			cout << "suspected error" << endl;
-			//cloud.channel.name = "error";
+			cloud.channel.name = "error";
 		}
       }
       pub.publish(cloud);
