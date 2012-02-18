@@ -12,8 +12,6 @@
   <depend package="std_msgs"/>
   <depend package="sensor_msgs"/>
   <depend package="cv_bridge"/>
-  <depend package="common_rosdeps" />
-  <rosdep name="eigen" />
 
 </package>
 
