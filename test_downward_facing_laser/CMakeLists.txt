@@ -31,7 +31,7 @@ include_directories(${EIGEN_INCLUDE_DIRS})
 #target_link_libraries(${PROJECT_NAME} another_library)
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
-rosbuild_add_executable(DFL_test src/Downward_Lasers.cpp)
+rosbuild_add_executable(Downward_Lasers src/Downward_Lasers.cpp)	#DFL_test was replaced by Downward_Lasers
 #target_link_libraries(example ${PROJECT_NAME})
-target_link_libraries(DFL_test ${OpenCV_LIBS})
+target_link_libraries(Downward_Lasers ${OpenCV_LIBS})	#DFL_test was replaced by Downward_Lasers
 

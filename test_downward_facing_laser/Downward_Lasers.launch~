@@ -1,7 +1,6 @@
 <launch>
-
-<node name="Downward_Lasers_Node" pkg="test_downward_facing_lasers" type="Downward_Lasers">
-	<remap from="/camera/image_mono" to="/usb_cam/image_raw" />
-</node>
-
+	<node name="Downward_Lasers_Node" pkg="test_downward_facing_laser" type="Downward_Lasers">
+		<remap from="/camera/image_rect" to="DFLcamera" />
+	</node>
 </launch>
+

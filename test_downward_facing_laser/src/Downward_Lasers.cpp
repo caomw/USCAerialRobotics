@@ -1,6 +1,7 @@
 
 #include <ros/ros.h>
 #include <cmath>
+#include <string>
 #include <iostream>
 #include <cv.h>
 #include <sensor_msgs/Image.h>
@@ -37,6 +38,7 @@ class Downward_Lasers
 	Mat img_laser_points_maxed;
 	
 	cv::Point* points[4];
+	cv::Point* orderedPointsReturned[4];
 	
 	int num_points;
 	
@@ -49,6 +51,10 @@ class Downward_Lasers
 	int filter_source;
 	int frameRateSlower;
 	
+	float halfVertViewingAngle;
+	float halfHorizViewingAngle;
+	
+	cv::Point center;
 	
   public:
 
@@ -67,9 +73,13 @@ class Downward_Lasers
 		
 		num_points = 4;
 		
+		halfVertViewingAngle = 22.5;
+		halfHorizViewingAngle = (91/16);
+		
 		for(int i = 0; i < 4; i++)
 		{
 			points[i] = new cv::Point();
+			orderedPointsReturned[i] = new cv::Point();
 		}
 		
 		green_blur_amt = 3;
@@ -82,7 +92,8 @@ class Downward_Lasers
 		frameRateSlower = 4;
 
 		sub_image_count = 0;
-		sub_image = nh.subscribe("/usb_cam/image_raw", 10, &Downward_Lasers::sub_image_callback, this);
+		//sub_image = nh.subscribe("/usb_cam/image_raw", 10, &Downward_Lasers::sub_image_callback, this);
+		sub_image = nh.subscribe("/camera/image_rect", 10, &Downward_Lasers::sub_image_callback, this);
 		
 		cv::namedWindow("Image");
 		cv::namedWindow("Filtered Result");
@@ -160,11 +171,35 @@ class Downward_Lasers
 			}
 			std::cout << std::endl;
 			
+			planeFinder(points);
+			
+			vector<cv::Scalar> rgbyColorScalars;
+			rgbyColorScalars.push_back(cv::Scalar(255, 0, 0));
+			rgbyColorScalars.push_back(cv::Scalar(0, 255, 0));
+			rgbyColorScalars.push_back(cv::Scalar(0, 0, 255));
+			rgbyColorScalars.push_back(cv::Scalar(255, 128, 0));
+			
+
+			
+			int x_center = 320;
+			int y_center = 240;
+			
+			int xSum = 0, ySum = 0;	
+			
+			for(int i = 0; i < 4; i++)
+			{
+				xSum += points[i]->x;
+				ySum += points[i]->y;
+			}
+			x_center = xSum /= 4;
+			y_center = ySum /= 4;
+			
+			cv::circle(img_color, cv::Point(x_center, y_center), 2, rgbyColorScalars[0], 2, 8, 0);
 			
 			//Draw circles on the color image
 			for(int i = 0; i < num_points; i++)
 			{
-				cv::circle(img_color, *points[i] /*cv::Point(points[i]->x, points[i]->y)*/, 8, cv::Scalar(0,0,255), 2, 8, 0);
+				cv::circle(img_color, *points[i], 8, rgbyColorScalars[i], 2, 8, 0);
 			}
 					
 			switch(filter_source)
@@ -206,8 +241,6 @@ class Downward_Lasers
 	
 			}
 
-			planeFinder(points);
-
 			cv::waitKey(1);
 		}
 		//cout << sub_image_count << endl;
@@ -223,7 +256,7 @@ class Downward_Lasers
 		_img = cv_image_ptr->image;
 	}
 	
-	vector<cv::Point> orderPoints(vector4f p, vector4f q, vector<cv::Point> laserPoints)
+	vector<cv::Point> orderPoints(Vector4f p, Vector4f q, vector<cv::Point> laserPoints)
 	{
 		/*vector<cv::Point> pqPoints;
 		for(int i = 0; i < 4; i++)
@@ -237,8 +270,10 @@ class Downward_Lasers
 			float minAngle = 180;
 			for(int j = 0; j < 4; j++)
 			{
-				vector2f pq << p(i), q(i);
-				vector2f xy << laserPoints[j].x, laserPoints[j].y;
+				Vector2f pq;
+				Vector2f xy;
+				pq << p(i), q(i);
+				xy << laserPoints[j].x, laserPoints[j].y;
 				float dotProduct;
 				float angle;
 				
@@ -270,11 +305,21 @@ class Downward_Lasers
 		int x_center = 320;
 		int y_center = 240;
 		
+		int xSum = 0, ySum = 0;	
+		
+		for(int i = 0; i < 4; i++)
+		{
+			xSum += points[i]->x;
+			ySum += points[i]->y;
+		}
+		x_center = xSum /= 4;
+		y_center = ySum /= 4;
+		
 		for(int i = 0 ; i < num_points; i++)
 		{
 			points_vector.push_back(*points[i]);
-			xCoords.push_back(points_vector[i].x);
-			yCoords.push_back(points_vector[i].y);
+			xCoords.push_back(points_vector[i].x - x_center);
+			yCoords.push_back(points_vector[i].y - y_center);
 		}
 		
 		/*
@@ -295,7 +340,6 @@ class Downward_Lasers
 		}
 		*/
 		
-		//sorted_points = orderPoints(/* */);	//p and q must be defined
 		
 		std::cout << "SORTED POINTS:  " << std::endl;
 		for(int i = 0 ; i < sorted_points.size(); i++)
@@ -304,7 +348,6 @@ class Downward_Lasers
 		}
 		std::cout << std::endl;
 		
-		//end point Sort
 		
 		
 		//eig
@@ -314,15 +357,16 @@ class Downward_Lasers
 		
 		for(int i = 0; i < xCoords.size(); i++)
 		{
-			//map pixel values to between -1 and 1
-			x(i) = xCoords.at(i);	//subtract or dicivde to convert to whatever everything else needs.  -240 or something?
-			y(i) = yCoords.at(i);
+			//map pixel values to between -tan(vert 20) and tan vert 20, and then same for horiz(96/16) or something
+			x(i) = (xCoords.at(i) * 2 * tan(halfHorizViewingAngle * (M_PI/180))) / (640);	//subtract or dicivde to convert to whatever everything else needs.  -240 or something?
+			y(i) = (yCoords.at(i) * 2 * tan(halfVertViewingAngle * (M_PI/180))) / (480);
 			std::cout << "X: " << x(i) << "  Y: " << y(i) << std::endl;
 		}
 		
+		float laserDist = .073;
 		
-		Vector4f p(1, -1, 0, 0);
-		Vector4f q(0, 0, 1, -1);
+		Vector4f p(-laserDist, laserDist, laserDist, -laserDist);
+		Vector4f q(laserDist, laserDist, -laserDist, -laserDist);
 		
 		sorted_points = orderPoints(p, q, points_vector);
 		
@@ -348,10 +392,10 @@ class Downward_Lasers
 			D = a * (a.transpose() * a).inverse() * a.transpose();	//what am i inverting?
 			
 			b << x(i), y(i);
-			v = D * b/*.transpose()*/;
+			v = /*D* */ b/*.transpose()*/;
 			
 			z(i) = ((a.transpose() * a).cwiseSqrt())(0) / ((v.transpose() * v).cwiseSqrt())(0);	//a is a nxm matrix a.transpose * a is mxm matrix  representing (x^2 + y^2)
-			
+			cout << "Z(" << i << "): " << z(i) << endl;
 		}
 		
 		A << x(0), y(0), 1,
