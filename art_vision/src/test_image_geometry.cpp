@@ -1,5 +1,6 @@
 #include <ros/ros.h>
 #include <image_geometry/pinhole_camera_model.h>
+<<<<<<< HEAD
 #include <image_transport/image_transport.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <sensor_msgs/CameraInfo.h>
@@ -8,10 +9,14 @@
 #include <tf/transform_listener.h>
 
 using namespace std;
+=======
+
+>>>>>>> 2f4b1e0ecc3af2df0c6f7b5c39aeb2c5d030e43a
 
 class TestImageGeometry {
 
   ros::NodeHandle nh;
+<<<<<<< HEAD
   ros::Publisher pub_cloud;
   image_transport::ImageTransport it;
   image_transport::CameraSubscriber sub_image_raw;
@@ -87,4 +92,27 @@ int main (int argc, char** argv) {
   TestImageGeometry test(nh);
   ros::spin();
   return 0;
+=======
+
+  sensor_msgs::CameraInfo info_cam;
+  image_geometry::PinholeCameraModel model_cam;
+
+public:
+  TestImageGeometry (ros::NodeHandle& nh_): nh(nh_) {
+
+    // TODO set up info cam
+    
+
+
+    model_cam.fromCameraInfo(info_cam);
+  }
+
+  void cb_image_raw (const sensor_msgs::Image::ConstPtr& msg_image_raw) {
+    cv::Mat image_raw(480, 640, CV_8UC1, &(msg_image_raw->data[0]));
+
+    sensor_msgs::PrintCloud cloud;
+
+  }
+
+>>>>>>> 2f4b1e0ecc3af2df0c6f7b5c39aeb2c5d030e43a
 }
