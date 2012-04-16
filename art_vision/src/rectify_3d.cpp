@@ -33,7 +33,7 @@ class Rectify3D {
                            const geometry_msgs::Vector3Stamped::ConstPtr& msg_rotation) {
     
     cv::Mat image_now;
-    cv::resize(cv::Mat(480, 640, CV_8UC1, (char*) msg_image_raw->data[0]), image_now, cv::Size(240, 320));
+    cv::resize(cv::Mat(480, 640, CV_8UC1, (char*) &(msg_image_raw->data[0])), image_now, cv::Size(240, 320));
 
     // Get features from image.
     vector<cv::Point> points_now;
