@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/187/trunk/hector_slam/hector_mapping/src
+END
+main.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/!svn/ver/30/trunk/hector_slam/hector_mapping/src/main.cpp
+END
+HectorMappingRos.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/!svn/ver/187/trunk/hector_slam/hector_mapping/src/HectorMappingRos.cpp
+END
+HectorDebugInfoProvider.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/32/trunk/hector_slam/hector_mapping/src/HectorDebugInfoProvider.h
+END
+main_mapper.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/30/trunk/hector_slam/hector_mapping/src/main_mapper.cpp
+END
+HectorDrawings.h
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/30/trunk/hector_slam/hector_mapping/src/HectorDrawings.h
+END
+HectorMappingRos.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/81/trunk/hector_slam/hector_mapping/src/HectorMappingRos.h
+END
+HectorMapMutex.h
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/30/trunk/hector_slam/hector_mapping/src/HectorMapMutex.h
+END

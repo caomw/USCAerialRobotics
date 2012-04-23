@@ -35,6 +35,7 @@ class LRF_Processor
                       geometry_msgs::Vector3Stamped> Policy_sync_subs;
     message_filters::Synchronizer<Policy_sync_subs> sync_subs;
     ros::Publisher pub;
+    ros::Publisher flatPub;
     
     LRF_Processor(ros::NodeHandle& _nh): nh(_nh),
         sub_lrf(nh, LRFTopic, 10),
@@ -42,6 +43,7 @@ class LRF_Processor
         sync_subs(Policy_sync_subs(10),sub_lrf, sub_gyro)
     {
         pub = _nh.advertise<sensor_msgs::PointCloud>("/lrf/PointCloud", 5);
+        flatPub = _nh.advertise<sensor_msgs::LaserScan>("/lrf/LaserScan", 5);
         sync_subs.registerCallback(boost::bind(&LRF_Processor::sync_subs_callback, this, _1, _2));
         //sub_lrf.registerCallback(&LRF_Processor::sub_lrf_callback, this);
     }
@@ -85,18 +87,35 @@ class LRF_Processor
         //double z_displacement = x_coord * sin(y_roll);
         //double z_displacement2 = y_coord * sin(x_pitch);
         double z_displacement3 = range * sin(y_roll) * sin(x_pitch);
-        cout << i << '\t' <<  x_coord << '\t' << y_coord << '\t' << z_displacement << " or " << z_displacement2 << endl;
+        cout << i << '\t' <<  x_coord << '\t' << y_coord << '\t' << endl;
 		
         cloud.points[i].x = x_coord;
         cloud.points[i].y = y_coord;
         cloud.points[i].z = 0.5;
-        if (z_displacement - height < 0.1 && z_displacement - height > -0.1){
-			cout << "suspected error" << endl;
-			//cloud.channel.name = "error";
-		}
+        
       }
+      cloudToFlatLaser(&cloud, _msg_lrf);
       pub.publish(cloud);
+      
     }
+    
+    void cloudToFlatLaser(sensor_msgs::PointCloud* cloud, const sensor_msgs::LaserScan::ConstPtr& oScan){
+		sensor_msgs::LaserScan flatLaser;
+		flatLaser.header = cloud->header;
+		flatLaser.ranges.resize(cloud->points.size());
+		flatLaser.angle_min = oScan->angle_min;
+		flatLaser.angle_max = oScan->angle_max;
+		flatLaser.angle_increment = oScan->angle_increment;
+		flatLaser.time_increment = oScan->time_increment;
+		flatLaser.scan_time = oScan->scan_time;
+		flatLaser.range_min = oScan->range_min;
+		flatLaser.range_max = oScan->range_max;
+		for (uint32_t i = 0; i < cloud->points.size(); i++){
+			geometry_msgs::Point32 point = cloud->points[i];
+			flatLaser.ranges[i] = sqrt(pow(point.x, 2) + pow(point.y, 2));
+		}
+		flatPub.publish(flatLaser);
+	}
 };
 
 int main(int argc, char **argv)
