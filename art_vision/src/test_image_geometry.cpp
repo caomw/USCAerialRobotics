@@ -1,6 +1,5 @@
 #include <ros/ros.h>
 #include <image_geometry/pinhole_camera_model.h>
-<<<<<<< HEAD
 #include <image_transport/image_transport.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <sensor_msgs/CameraInfo.h>
@@ -9,14 +8,10 @@
 #include <tf/transform_listener.h>
 
 using namespace std;
-=======
-
->>>>>>> 2f4b1e0ecc3af2df0c6f7b5c39aeb2c5d030e43a
 
 class TestImageGeometry {
 
   ros::NodeHandle nh;
-<<<<<<< HEAD
   ros::Publisher pub_cloud;
   image_transport::ImageTransport it;
   image_transport::CameraSubscriber sub_image_raw;
@@ -36,14 +31,21 @@ public:
     cv::Mat image_raw(480, 640, CV_8UC1, (void*) &(msg_image_raw->data[0]));
     model_cam.fromCameraInfo(msg_info_cam);
 
+    //debug
+    cout << model_cam.fx() << " " << model_cam.fy() << endl
+         << model_cam.fx() / 640 << " " << model_cam.fy() / 480 << endl;
+
     tf::StampedTransform trafo;
     ros::Time time_on = ros::Time::now();
     ros::Duration time_out(0.5);
     tf_listener.waitForTransform("/world", "/camera", time_on, time_out);
     tf_listener.lookupTransform("/world", "/camera", time_on, trafo);
-    
+
     vector<cv::Point2f> pixels;
-    initialize(pixels);
+    cv::goodFeaturesToTrack(image_raw, pixels, 50, 0.5, 0.1);
+    
+    //vector<cv::Point2f> pixels;
+    //initialize(pixels);
 
     sensor_msgs::PointCloud cloud;
     for (size_t i = 0; i < pixels.size(); i++) {
@@ -56,23 +58,16 @@ public:
       msg_point.y = vec_point.getY();
       msg_point.z = vec_point.getZ();
 
-      msg_point.x *= 2/msg_point.z;
-      msg_point.y *= 2/msg_point.z;
-      msg_point.z = 2;
+      float scale = 640.0/model_cam.fx();
+
+      msg_point.x *= scale/msg_point.z;
+      msg_point.y *= scale/msg_point.z;
+      msg_point.z = scale;
 
       cloud.points.push_back(msg_point);
     }
     cloud.header.frame_id="/world";
     pub_cloud.publish(cloud);
-
-    /*
-    vector<cv::Point2f> corners;
-    cv::goodFeaturesToTrack(image_raw, corners, 50, 0.5, 0.1);
-    for(size_t i = 0; i < corners.size(); i++)
-      cv::circle(image_raw, corners[i], 3, cv::Scalar(255), 3);
-    cv::imshow("yes", image_raw);
-    cv::waitKey(10);
-    */
   }
 
 
@@ -92,27 +87,4 @@ int main (int argc, char** argv) {
   TestImageGeometry test(nh);
   ros::spin();
   return 0;
-=======
-
-  sensor_msgs::CameraInfo info_cam;
-  image_geometry::PinholeCameraModel model_cam;
-
-public:
-  TestImageGeometry (ros::NodeHandle& nh_): nh(nh_) {
-
-    // TODO set up info cam
-    
-
-
-    model_cam.fromCameraInfo(info_cam);
-  }
-
-  void cb_image_raw (const sensor_msgs::Image::ConstPtr& msg_image_raw) {
-    cv::Mat image_raw(480, 640, CV_8UC1, &(msg_image_raw->data[0]));
-
-    sensor_msgs::PrintCloud cloud;
-
-  }
-
->>>>>>> 2f4b1e0ecc3af2df0c6f7b5c39aeb2c5d030e43a
 }
