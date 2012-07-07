@@ -4,13 +4,13 @@
      art_navigation
 
   </description>
-  <author>Sam Zhai</author>
+  <author>Sam Zhai, Keith McKay, and Russell Stewart</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/art_navigation</url>
   <depend package="roscpp"/>
   <depend package="std_msgs"/>
-
+  <depend package="sensor_msgs"/>
 </package>
 
 
