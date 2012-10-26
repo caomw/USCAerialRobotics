@@ -1,0 +1,9 @@
+<launch>
+  <include file="$(find art_launch)/ptgrey_camera.launch" />
+  <node name="node_test_image_geometry" pkg="art_vision" type="test_image_geometry">
+    <remap from="image_raw" to="/camera/image_mono"/>
+  </node>
+
+  <node name="tf_publisher_imu_camera" pkg="tf" type="static_transform_publisher"
+    args="0 0 0 0 0 0 /imu /camera 100" />
+</launch>
