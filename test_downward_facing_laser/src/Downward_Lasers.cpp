@@ -93,7 +93,8 @@ class Downward_Lasers
 
 		sub_image_count = 0;
 		//sub_image = nh.subscribe("/usb_cam/image_raw", 10, &Downward_Lasers::sub_image_callback, this);
-		sub_image = nh.subscribe("/camera/image_rect", 10, &Downward_Lasers::sub_image_callback, this);
+		//sub_image = nh.subscribe("/camera/image_rect", 10, &Downward_Lasers::sub_image_callback, this);//THIS IS WHAT YOU WANT TO RUN
+		sub_image = nh.subscribe("/camera/image_raw", 10, &Downward_Lasers::sub_image_callback, this);//Testing camera...
 		
 		cv::namedWindow("Image");
 		cv::namedWindow("Filtered Result");
