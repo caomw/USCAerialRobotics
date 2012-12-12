@@ -4,16 +4,17 @@
      art_lrf
 
   </description>
-  <author>Tal Levy</author>
+  <author>ART</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/art_lrf</url>
+  <url>http://ros.org/wiki/art_laser</url>
   <depend package="roscpp"/>
   <depend package="std_msgs"/>
   <depend package="sensor_msgs"/>
-  <depend package ="message_filters"/>
   <depend package="geometry_msgs"/>
-  <depend package="opencv2"/>
-</package>
+  <depend package="common_rosdeps" />
+  <depend package="rospy" />
+  <rosdep name="eigen" />
 
+</package>
 
