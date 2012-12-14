@@ -79,7 +79,7 @@ void Drift_correction(void)
   // Accel_weight = constrain(1 - 4*abs(1 - Accel_magnitude),0,1);
   // Weight for accelerometer info (<0.5G = 0.0, 1G = 1.0 , >1.5G = 0.0)
   //Accel_weight = constrain(1 - 2*abs(1 - Accel_magnitude),0,1);
-  Accel_weight = -1.0;
+  Accel_weight = 1.0;
 
   VectorCrossProduct(&errorRollPitch[0],&Accel_Vector[0],&DCM_Matrix[2][0]); //adjust the ground of reference
   VectorScale(&Omega_P[0],&errorRollPitch[0],KpDCM_rollpitch*Accel_weight);

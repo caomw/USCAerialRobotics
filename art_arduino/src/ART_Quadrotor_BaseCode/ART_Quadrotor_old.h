@@ -27,16 +27,16 @@
 // PID constants
 float Kproll = 1.3;
 float Kiroll = 0.2;
-float Kdroll = 0.4;
+float Kdroll = 0.5;
 float Kppitch = Kproll;
 float Kipitch = Kiroll;
 float Kdpitch = Kdroll;
 float Kpyaw = 1.0;
 float Kiyaw = 0.0;
 float Kdyaw = 0.4;
-float Kpaltitude = 1.2; 
-float Kialtitude = 0.2;  
-float Kdaltitude = 0.8;  
+float Kpaltitude = 0.7; 
+float Kialtitude = 0.7;  
+float Kdaltitude = 1.6;  
 
 //PID Max Term's
 float pitchRollMax = 150;
@@ -64,9 +64,12 @@ int sonarData[8];
 float pressureAltitude = 0;
 float groundPressureAltitude = 0;
 float actualAltitude = 17.0; 
+float sonarReading = 0;
+float previousReading = 0;
 byte currentSonarData = 0;
 int landingAltitude = 0;
 int altitudeThrottle = 0;
+int holdingThrottle = 0;
 int flag = 0;
 bool holdingAltitude = false;
 bool isLanding = false;
