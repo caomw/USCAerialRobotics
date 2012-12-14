@@ -11,7 +11,7 @@
 #define SWITCH2 40
 
 #define MINTHROTTLE 1200
-#define MIDCHANNEL 1501
+#define MIDCHANNEL 1500
 
 #define Gyro_Gain_X 0.4  //X axis Gyro gain
 #define Gyro_Gain_Y 0.41 //Y axis Gyro gain
@@ -25,37 +25,21 @@
 #define Gyro_Scaled_Z(x) x*ToRad(Gyro_Gain_Z) //Return the scaled ADC raw data of the gyro in radians for second
 
 // PID constants
-float Kproll = 1.1;
+float Kproll = 1.3;
 float Kiroll = 0.2;
-float Kdroll = 0.7;
-float Kppitch = 1.1;
-float Kipitch = 0.2;
-float Kdpitch = 0.7;
+float Kdroll = 0.5;
+float Kppitch = Kproll;
+float Kipitch = Kiroll;
+float Kdpitch = Kdroll;
 float Kpyaw = 1.0;
 float Kiyaw = 0.0;
-float Kdyaw = 0.6;
-float Kpaltitude = 1.0; 
-float Kialtitude = 0.4;  
-float Kdaltitude = 0.6;
-
-//Trims and Biases
-
-float trimRoll = 0;
-float trimPitch = 0;
-float trimYaw = 0;
-float trimPitchRollRate = 1/30;
-float trimPitchRollRange = 2;
-float trimYawRate = 1/20;
-float trimYawRange = 50;
-
-
-float biasRoll = 0;
-float biasPitch = 0;
-  
+float Kdyaw = 0.4;
+float Kpaltitude = 0.7; 
+float Kialtitude = 0.7;  
+float Kdaltitude = 1.6;  
 
 //PID Max Term's
-float pitchRollIMax = 50;
-float altitudeIMax = 200;
+float pitchRollMax = 150;
 
 // Define vars //
 float loopDt = 0.02; // This will be changed per loop
@@ -67,15 +51,11 @@ long telemetryTimer = 0;
 long compassReadTimer = 0;
 long sonarTimer = 0;
 long otherTimer = 0;
-long EEPROMClearTimer = 0;
 long timeStep = 0;
 long landingTime = 0;
 long counter = 0;
-long altHoldStart = 0;
-long altHoldDelay = 0;
 
-float previousActualAltitude = 17;
-float previousSonarAltitude = 17;
+float previousAltitude = 17;
 float usedAltitude = 17;
 int motorsArmed = 0;
 float desiredAltitude = 0;
@@ -84,13 +64,18 @@ int sonarData[8];
 float pressureAltitude = 0;
 float groundPressureAltitude = 0;
 float actualAltitude = 17.0; 
+float sonarReading = 0;
+float previousReading = 0;
 byte currentSonarData = 0;
 int landingAltitude = 0;
 int altitudeThrottle = 0;
-int holdingAltitude = 0;
+int holdingThrottle = 0;
 int flag = 0;
-float maxAutoBias = 3;
-
+bool holdingAltitude = false;
+bool isLanding = false;
+bool isManualControl = true;
+bool holdingPosition = false;
+bool altHold = false;
 
 int controlRoll = 0;
 int controlPitch = 0;
@@ -124,19 +109,16 @@ int gyroOffset[3] = {1659,1618,1673};
 
 float Omega[3]= {0,0,0};
 
-double dummya;
-
 // Transmitter Data Storage
 int RCInput[8];
-float pilotRoll = 0;
-float pilotRollOld = 0;
-float pilotPitch = 0;
-float pilotPitchOld = 0;
-float pilotYaw = 0;
-float pilotYawOld = 0;
-float pilotThrottle = 0;
-float throttle = 1200;
-float holdingThrottle = 0;
+int pilotRoll = 0;
+int pilotRollOld = 0;
+int pilotPitch = 0;
+int pilotPitchOld = 0;
+int pilotYaw = 0;
+int pilotYawOld = 0;
+int pilotThrottle = 0;
+int throttle = 1200;
 
 // DCM PID Values (these will be hard code initialized)
 float KpDCM_rollpitch = .002;
@@ -150,11 +132,4 @@ float pitch;
 float yaw;
 
 int motor[4];
-
-//State Machine
-bool isLanding = false;
-bool isManualControl = true;
-bool holdingPosition = false;
-bool altHold = false;
-bool autoTrim = false;
 
