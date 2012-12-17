@@ -164,10 +164,10 @@ void compare_scans(boost::shared_ptr<vector<line> > firstScan,
 	{
 	    if (min(abs(delta_theta*(firstScan->at(i).theta_index - secondScan->at(j).theta_index) - rotOut), abs(delta_theta*(firstScan->at(i).theta_index - secondScan->at(j).theta_index) - rotOut + 360))< 10)
 	    {
-		float expected_rho_change; 
-		expected_rho_change = translation_prior_mean[0]*cos(theta[secondScan->at(j).theta_index]) + translation_prior_mean[1]*sin(theta[secondScan->at(j).theta_index]); // posibly switch this line to minus sign???
 
-		if(abs(firstScan->at(i).est_rho - (secondScan->at(j).est_rho + expected_rho_change)) < rho_sanity_tolerance)
+		float expected_rho_change;
+		expected_rho_change = -(translation_prior_mean[0]*cos(theta[firstScan->at(i).theta_index]) + translation_prior_mean(1)*sin(theta[firstScan->at(i).theta_index]) );
+		if(abs(firstScan->at(i).est_rho + expected_rho_change - secondScan->at(j).est_rho) < rho_sanity_tolerance)
 		{
 		    vector<int> temp_vector(2,0);
 		    temp_vector[0] = i; temp_vector[1] = j;
@@ -193,9 +193,14 @@ void compare_scans(boost::shared_ptr<vector<line> > firstScan,
 	MatrixXf A(matched_lines.size(),2);
 	for (int i=0; i<matched_lines.size(); i++)
 	{
-	    A(i,0) = cos(theta[secondScan->at(matched_lines[i][1]).theta_index]);
-	    A(i,1) = sin(theta[secondScan->at(matched_lines[i][1]).theta_index]);
-						
+
+	    A(i,0) = cos(theta[firstScan->at(matched_lines[i][0]).theta_index]);
+	    A(i,1) = sin(theta[firstScan->at(matched_lines[i][0]).theta_index]);
+
+
+//	    A(i,0) = cos(theta[secondScan->at(matched_lines[i][1]).theta_index]);
+//	    A(i,1) = sin(theta[secondScan->at(matched_lines[i][1]).theta_index]);
+
 	    cout << A(i,0) << "  " << A(i,1) << endl;
 	}
 
@@ -273,13 +278,13 @@ public:
     ros::NodeHandle nh;
     ros::Subscriber sub_lines;
     ros::Publisher pub_pos;
-    std_msgs::String pos_msg_old;
+    geometry_msgs::Point32 pos_msg_old;
 
     double counter;
     boost::shared_ptr<vector<line> > scan1, scan2, original_scan;
 
     Compare(ros::NodeHandle& _nh): nh(_nh) {
-	pub_pos = nh.advertise<std_msgs::String>("/arduino/pos", 1);
+	pub_pos = nh.advertise<geometry_msgs::Point32>("/arduino/pos", 1);
 	sub_lines = nh.subscribe("/lrfLines", 1, &Compare::lines_callback, this);	
 	counter = 0;
     }
@@ -380,25 +385,18 @@ public:
 	
 	    }
 
-	    union PosPacket {
-		struct {
-		    int x;
-		    int y;
-		    int theta;
-		};
-		char data[12];
-	    } pos;
 
-	    pos.x = find_pos_index(est_translation(0));
-	    pos.y = find_pos_index(est_translation(1));
-	    pos.theta = find_heading_index(est_rot);
 
-	    std_msgs::String pos_msg;
-	
-	    pos_msg.data = pos.data;
+	    geometry_msgs::Point32 pos_msg;
+	    pos_msg.x = est_translation(0);
+	    pos_msg.y = est_translation(1);
+	    pos_msg.z = est_rot;
+
 	    pub_pos.publish(pos_msg);
 	
-	    pos_msg_old.data = pos_msg.data;
+	    pos_msg_old.x = pos_msg.x;
+	    pos_msg_old.y = pos_msg.y;
+	    pos_msg_old.z = pos_msg.z;
 	}		
 
 
@@ -419,7 +417,7 @@ int main (int argc, char** argv) {
 
     Compare compare(nh);
 
-    ros::Rate loop_rate(2);
+    ros::Rate loop_rate(10);
     while(ros::ok()) {
 	ros::spinOnce();
 	loop_rate.sleep();
