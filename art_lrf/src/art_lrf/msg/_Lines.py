@@ -5,11 +5,12 @@ import struct
 import geometry_msgs.msg
 
 class Lines(roslib.message.Message):
-  _md5sum = "ead62ce9e6c9621cd78ecacc9cfb5ae7"
+  _md5sum = "5e886f1edefc993f520f05d33f4e8b92"
   _type = "art_lrf/Lines"
   _has_header = False #flag to mark the presence of a Header object
   _full_text = """int32[] theta_index
 float32[] est_rho
+float32[] est_theta
 float32[] delta_rho
 geometry_msgs/Polygon[] endpoints
 geometry_msgs/Polygon[] lengths
@@ -35,8 +36,8 @@ float32 x
 float32 y
 float32 z
 """
-  __slots__ = ['theta_index','est_rho','delta_rho','endpoints','lengths','endpoint_ranges','theta']
-  _slot_types = ['int32[]','float32[]','float32[]','geometry_msgs/Polygon[]','geometry_msgs/Polygon[]','geometry_msgs/Polygon[]','geometry_msgs/Polygon[]']
+  __slots__ = ['theta_index','est_rho','est_theta','delta_rho','endpoints','lengths','endpoint_ranges','theta']
+  _slot_types = ['int32[]','float32[]','float32[]','float32[]','geometry_msgs/Polygon[]','geometry_msgs/Polygon[]','geometry_msgs/Polygon[]','geometry_msgs/Polygon[]']
 
   def __init__(self, *args, **kwds):
     """
@@ -46,7 +47,7 @@ float32 z
     changes.  You cannot mix in-order arguments and keyword arguments.
     
     The available fields are:
-       theta_index,est_rho,delta_rho,endpoints,lengths,endpoint_ranges,theta
+       theta_index,est_rho,est_theta,delta_rho,endpoints,lengths,endpoint_ranges,theta
     
     @param args: complete set of field values, in .msg order
     @param kwds: use keyword arguments corresponding to message field names
@@ -59,6 +60,8 @@ float32 z
         self.theta_index = []
       if self.est_rho is None:
         self.est_rho = []
+      if self.est_theta is None:
+        self.est_theta = []
       if self.delta_rho is None:
         self.delta_rho = []
       if self.endpoints is None:
@@ -72,6 +75,7 @@ float32 z
     else:
       self.theta_index = []
       self.est_rho = []
+      self.est_theta = []
       self.delta_rho = []
       self.endpoints = []
       self.lengths = []
@@ -99,6 +103,10 @@ float32 z
       buff.write(_struct_I.pack(length))
       pattern = '<%sf'%length
       buff.write(struct.pack(pattern, *self.est_rho))
+      length = len(self.est_theta)
+      buff.write(_struct_I.pack(length))
+      pattern = '<%sf'%length
+      buff.write(struct.pack(pattern, *self.est_theta))
       length = len(self.delta_rho)
       buff.write(_struct_I.pack(length))
       pattern = '<%sf'%length
@@ -160,6 +168,13 @@ float32 z
       start = end
       end += struct.calcsize(pattern)
       self.est_rho = struct.unpack(pattern, str[start:end])
+      start = end
+      end += 4
+      (length,) = _struct_I.unpack(str[start:end])
+      pattern = '<%sf'%length
+      start = end
+      end += struct.calcsize(pattern)
+      self.est_theta = struct.unpack(pattern, str[start:end])
       start = end
       end += 4
       (length,) = _struct_I.unpack(str[start:end])
@@ -261,6 +276,10 @@ float32 z
       buff.write(_struct_I.pack(length))
       pattern = '<%sf'%length
       buff.write(self.est_rho.tostring())
+      length = len(self.est_theta)
+      buff.write(_struct_I.pack(length))
+      pattern = '<%sf'%length
+      buff.write(self.est_theta.tostring())
       length = len(self.delta_rho)
       buff.write(_struct_I.pack(length))
       pattern = '<%sf'%length
@@ -324,6 +343,13 @@ float32 z
       start = end
       end += struct.calcsize(pattern)
       self.est_rho = numpy.frombuffer(str[start:end], dtype=numpy.float32, count=length)
+      start = end
+      end += 4
+      (length,) = _struct_I.unpack(str[start:end])
+      pattern = '<%sf'%length
+      start = end
+      end += struct.calcsize(pattern)
+      self.est_theta = numpy.frombuffer(str[start:end], dtype=numpy.float32, count=length)
       start = end
       end += 4
       (length,) = _struct_I.unpack(str[start:end])

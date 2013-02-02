@@ -36,10 +36,10 @@ CMAKE_COMMAND = /usr/bin/cmake
 RM = /usr/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/ubuntuuser/ROS/beohawk-ros/art_lrf
+CMAKE_SOURCE_DIR = /home/macuser/ROS/beohawk-ros/art_lrf
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/ubuntuuser/ROS/beohawk-ros/art_lrf
+CMAKE_BINARY_DIR = /home/macuser/ROS/beohawk-ros/art_lrf
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -66,9 +66,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ubuntuuser/ROS/beohawk-ros/art_lrf/CMakeFiles /home/ubuntuuser/ROS/beohawk-ros/art_lrf/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/macuser/ROS/beohawk-ros/art_lrf/CMakeFiles /home/macuser/ROS/beohawk-ros/art_lrf/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/ubuntuuser/ROS/beohawk-ros/art_lrf/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/macuser/ROS/beohawk-ros/art_lrf/CMakeFiles 0
 .PHONY : all
 
 # The main clean target

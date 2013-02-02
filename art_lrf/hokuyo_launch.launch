@@ -1,0 +1,4 @@
+<launch>
+  <node name="hokuyo_node" pkg="hokuyo_node" type="hokuyo_node" />
+
+</launch>

@@ -17,6 +17,11 @@
     :initarg :est_rho
     :type (cl:vector cl:float)
    :initform (cl:make-array 0 :element-type 'cl:float :initial-element 0.0))
+   (est_theta
+    :reader est_theta
+    :initarg :est_theta
+    :type (cl:vector cl:float)
+   :initform (cl:make-array 0 :element-type 'cl:float :initial-element 0.0))
    (delta_rho
     :reader delta_rho
     :initarg :delta_rho
@@ -61,6 +66,11 @@
 (cl:defmethod est_rho-val ((m <Lines>))
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader art_lrf-msg:est_rho-val is deprecated.  Use art_lrf-msg:est_rho instead.")
   (est_rho m))
+
+(cl:ensure-generic-function 'est_theta-val :lambda-list '(m))
+(cl:defmethod est_theta-val ((m <Lines>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader art_lrf-msg:est_theta-val is deprecated.  Use art_lrf-msg:est_theta instead.")
+  (est_theta m))
 
 (cl:ensure-generic-function 'delta_rho-val :lambda-list '(m))
 (cl:defmethod delta_rho-val ((m <Lines>))
@@ -111,6 +121,17 @@
     (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream)))
    (cl:slot-value msg 'est_rho))
+  (cl:let ((__ros_arr_len (cl:length (cl:slot-value msg 'est_theta))))
+    (cl:write-byte (cl:ldb (cl:byte 8 0) __ros_arr_len) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) __ros_arr_len) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) __ros_arr_len) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) __ros_arr_len) ostream))
+  (cl:map cl:nil #'(cl:lambda (ele) (cl:let ((bits (roslisp-utils:encode-single-float-bits ele)))
+    (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream)))
+   (cl:slot-value msg 'est_theta))
   (cl:let ((__ros_arr_len (cl:length (cl:slot-value msg 'delta_rho))))
     (cl:write-byte (cl:ldb (cl:byte 8 0) __ros_arr_len) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 8) __ros_arr_len) ostream)
@@ -186,6 +207,20 @@
     (cl:setf (cl:ldb (cl:byte 8 8) __ros_arr_len) (cl:read-byte istream))
     (cl:setf (cl:ldb (cl:byte 8 16) __ros_arr_len) (cl:read-byte istream))
     (cl:setf (cl:ldb (cl:byte 8 24) __ros_arr_len) (cl:read-byte istream))
+  (cl:setf (cl:slot-value msg 'est_theta) (cl:make-array __ros_arr_len))
+  (cl:let ((vals (cl:slot-value msg 'est_theta)))
+    (cl:dotimes (i __ros_arr_len)
+    (cl:let ((bits 0))
+      (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 8) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 16) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 24) bits) (cl:read-byte istream))
+    (cl:setf (cl:aref vals i) (roslisp-utils:decode-single-float-bits bits))))))
+  (cl:let ((__ros_arr_len 0))
+    (cl:setf (cl:ldb (cl:byte 8 0) __ros_arr_len) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 8) __ros_arr_len) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 16) __ros_arr_len) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 24) __ros_arr_len) (cl:read-byte istream))
   (cl:setf (cl:slot-value msg 'delta_rho) (cl:make-array __ros_arr_len))
   (cl:let ((vals (cl:slot-value msg 'delta_rho)))
     (cl:dotimes (i __ros_arr_len)
@@ -245,20 +280,21 @@
   "art_lrf/Lines")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<Lines>)))
   "Returns md5sum for a message object of type '<Lines>"
-  "ead62ce9e6c9621cd78ecacc9cfb5ae7")
+  "5e886f1edefc993f520f05d33f4e8b92")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'Lines)))
   "Returns md5sum for a message object of type 'Lines"
-  "ead62ce9e6c9621cd78ecacc9cfb5ae7")
+  "5e886f1edefc993f520f05d33f4e8b92")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<Lines>)))
   "Returns full string definition for message of type '<Lines>"
-  (cl:format cl:nil "int32[] theta_index~%float32[] est_rho~%float32[] delta_rho~%geometry_msgs/Polygon[] endpoints~%geometry_msgs/Polygon[] lengths~%geometry_msgs/Polygon[] endpoint_ranges~%geometry_msgs/Polygon[] theta~%~%================================================================================~%MSG: geometry_msgs/Polygon~%#A specification of a polygon where the first and last points are assumed to be connected~%geometry_msgs/Point32[] points~%~%================================================================================~%MSG: geometry_msgs/Point32~%# This contains the position of a point in free space(with 32 bits of precision).~%# It is recommeded to use Point wherever possible instead of Point32.  ~%# ~%# This recommendation is to promote interoperability.  ~%#~%# This message is designed to take up less space when sending~%# lots of points at once, as in the case of a PointCloud.  ~%~%float32 x~%float32 y~%float32 z~%~%"))
+  (cl:format cl:nil "int32[] theta_index~%float32[] est_rho~%float32[] est_theta~%float32[] delta_rho~%geometry_msgs/Polygon[] endpoints~%geometry_msgs/Polygon[] lengths~%geometry_msgs/Polygon[] endpoint_ranges~%geometry_msgs/Polygon[] theta~%~%================================================================================~%MSG: geometry_msgs/Polygon~%#A specification of a polygon where the first and last points are assumed to be connected~%geometry_msgs/Point32[] points~%~%================================================================================~%MSG: geometry_msgs/Point32~%# This contains the position of a point in free space(with 32 bits of precision).~%# It is recommeded to use Point wherever possible instead of Point32.  ~%# ~%# This recommendation is to promote interoperability.  ~%#~%# This message is designed to take up less space when sending~%# lots of points at once, as in the case of a PointCloud.  ~%~%float32 x~%float32 y~%float32 z~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'Lines)))
   "Returns full string definition for message of type 'Lines"
-  (cl:format cl:nil "int32[] theta_index~%float32[] est_rho~%float32[] delta_rho~%geometry_msgs/Polygon[] endpoints~%geometry_msgs/Polygon[] lengths~%geometry_msgs/Polygon[] endpoint_ranges~%geometry_msgs/Polygon[] theta~%~%================================================================================~%MSG: geometry_msgs/Polygon~%#A specification of a polygon where the first and last points are assumed to be connected~%geometry_msgs/Point32[] points~%~%================================================================================~%MSG: geometry_msgs/Point32~%# This contains the position of a point in free space(with 32 bits of precision).~%# It is recommeded to use Point wherever possible instead of Point32.  ~%# ~%# This recommendation is to promote interoperability.  ~%#~%# This message is designed to take up less space when sending~%# lots of points at once, as in the case of a PointCloud.  ~%~%float32 x~%float32 y~%float32 z~%~%"))
+  (cl:format cl:nil "int32[] theta_index~%float32[] est_rho~%float32[] est_theta~%float32[] delta_rho~%geometry_msgs/Polygon[] endpoints~%geometry_msgs/Polygon[] lengths~%geometry_msgs/Polygon[] endpoint_ranges~%geometry_msgs/Polygon[] theta~%~%================================================================================~%MSG: geometry_msgs/Polygon~%#A specification of a polygon where the first and last points are assumed to be connected~%geometry_msgs/Point32[] points~%~%================================================================================~%MSG: geometry_msgs/Point32~%# This contains the position of a point in free space(with 32 bits of precision).~%# It is recommeded to use Point wherever possible instead of Point32.  ~%# ~%# This recommendation is to promote interoperability.  ~%#~%# This message is designed to take up less space when sending~%# lots of points at once, as in the case of a PointCloud.  ~%~%float32 x~%float32 y~%float32 z~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <Lines>))
   (cl:+ 0
      4 (cl:reduce #'cl:+ (cl:slot-value msg 'theta_index) :key #'(cl:lambda (ele) (cl:declare (cl:ignorable ele)) (cl:+ 4)))
      4 (cl:reduce #'cl:+ (cl:slot-value msg 'est_rho) :key #'(cl:lambda (ele) (cl:declare (cl:ignorable ele)) (cl:+ 4)))
+     4 (cl:reduce #'cl:+ (cl:slot-value msg 'est_theta) :key #'(cl:lambda (ele) (cl:declare (cl:ignorable ele)) (cl:+ 4)))
      4 (cl:reduce #'cl:+ (cl:slot-value msg 'delta_rho) :key #'(cl:lambda (ele) (cl:declare (cl:ignorable ele)) (cl:+ 4)))
      4 (cl:reduce #'cl:+ (cl:slot-value msg 'endpoints) :key #'(cl:lambda (ele) (cl:declare (cl:ignorable ele)) (cl:+ (roslisp-msg-protocol:serialization-length ele))))
      4 (cl:reduce #'cl:+ (cl:slot-value msg 'lengths) :key #'(cl:lambda (ele) (cl:declare (cl:ignorable ele)) (cl:+ (roslisp-msg-protocol:serialization-length ele))))
@@ -270,6 +306,7 @@
   (cl:list 'Lines
     (cl:cons ':theta_index (theta_index msg))
     (cl:cons ':est_rho (est_rho msg))
+    (cl:cons ':est_theta (est_theta msg))
     (cl:cons ':delta_rho (delta_rho msg))
     (cl:cons ':endpoints (endpoints msg))
     (cl:cons ':lengths (lengths msg))

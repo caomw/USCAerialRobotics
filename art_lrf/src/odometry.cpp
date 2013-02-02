@@ -20,6 +20,13 @@
 using namespace std;
 using namespace Eigen;
 
+
+bool firstRun = true;
+int est_rot = 0;
+int previous_est_rot = 0;
+Vector2f est_translation;
+Vector2f previous_translation;
+
 class line {
 
 public:
@@ -46,12 +53,31 @@ public:
     }
 };
 
-bool doNextRun = false;
-bool firstRun = true;
-int est_rot = 0;
-int previous_est_rot = 0;
-Vector2f est_translation;
-Vector2f previous_translation;
+class measurement
+{
+     vector<line> lines;
+     float x;
+     float y;
+     float yaw;
+};
+
+class waypoints
+{
+    vector<measurement> measurements;
+    void update(measurement newMeasurement)
+    {
+	if( measurements.size() == 0)
+	    {
+		measurements.push_back(newMeasurement);
+		return;
+	    }
+		
+
+	measurement currentMeasurement = measurements(measurements.size()-1);
+    }
+			   
+	       
+} waypoints;
 
 vector<float> linspace(double min_range, double max_range, int total_no_points)  {
     vector<float> phi = std::vector<float>(total_no_points);
@@ -258,7 +284,8 @@ void compare_scans(boost::shared_ptr<vector<line> > firstScan,
 	observed_projection2f(1,0) = observed_projection(1,0);
 	observed_projection2f(1,1) = observed_projection(1,1);
 
-	translationOut = observed_projection2f * currentTranslation + (previous_translation - observed_projection2f*previous_translation);
+	//translationOut = observed_projection2f * currentTranslation + (previous_translation - observed_projection2f*previous_translation);
+	translationOut = currentTranslation;
 
 
 	if (rotOut > 180) {				
@@ -368,11 +395,6 @@ public:
 		firstRun = false;
 		scan1 = scan2;
 		previous_translation << 0,0;
-	    }
-	    if (doNextRun == false)
-	    {
-		//scan1 = scan2;
-		doNextRun = true;
 	    }
 	    else
 	    {

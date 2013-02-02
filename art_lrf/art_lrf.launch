@@ -1,5 +1,6 @@
 <launch>
   <node name="hokuyo_node" pkg="hokuyo_node" type="hokuyo_node" />
   <node name="line_finder" pkg="art_lrf" type="line_finder" />
+  <node name="serial_node.py" pkg="rosserial_python" type="serial_node.py" />
   
 </launch>
