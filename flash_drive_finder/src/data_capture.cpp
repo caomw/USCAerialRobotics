@@ -53,28 +53,28 @@ DataCapture::initialize()
   image_mode.nXRes = width;
   image_mode.nYRes = height;
   image_mode.nFPS = 30;
-  image_gen.SetMapOutputMode(image_mode);
-  CHECK_STATUS(rc, "Setting image output mode");
+  //image_gen.SetMapOutputMode(image_mode);
+  //CHECK_STATUS(rc, "Setting image output mode");
 
 
   printf("Initializing depth stream\n");
-  rc = depth_gen.Create(context);
-  CHECK_STATUS(rc, "Initializing depth stream");
+  //rc = depth_gen.Create(context);
+  //CHECK_STATUS(rc, "Initializing depth stream");
 
-  depth_gen.SetMapOutputMode(image_mode);
-  CHECK_STATUS(rc, "Setting depth output mode");
+  //depth_gen.SetMapOutputMode(image_mode);
+  //CHECK_STATUS(rc, "Setting depth output mode");
 
-  depth_gen.GetMetaData(depth_md);
-  printf("Depth offset: %d %d\n", depth_md.XOffset(), depth_md.YOffset());
+  //depth_gen.GetMetaData(depth_md);
+  //printf("Depth offset: %d %d\n", depth_md.XOffset(), depth_md.YOffset());
   // XXX do we need to do something with the depth offset?
 
   // set the depth image viewpoint
-  depth_gen.GetAlternativeViewPointCap().SetViewPoint(image_gen);
+  //depth_gen.GetAlternativeViewPointCap().SetViewPoint(image_gen);
 
   // read off the depth camera field of view.  This is the FOV corresponding to
   // the IR camera viewpoint, regardless of the alternative viewpoint settings.
-  XnFieldOfView fov;
-  rc = depth_gen.GetFieldOfView(fov);
+  //XnFieldOfView fov;
+  //rc = depth_gen.GetFieldOfView(fov);
   return true;
 }
 

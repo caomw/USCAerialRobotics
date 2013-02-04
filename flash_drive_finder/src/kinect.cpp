@@ -13,9 +13,17 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
-
+#include <message_filters/subscriber.h>
+#include <message_filters/synchronizer.h>
+#include <message_filters/sync_policies/approximate_time.h>
 #include <fovis/fovis.hpp>
 #include "data_capture.hpp"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <signal.h>
+#include <string>
 
 
 namespace enc = sensor_msgs::image_encodings;
@@ -26,80 +34,201 @@ using namespace cv;
 
 class kinectNode {
 
-	public:
+public:
 
-	private:
-		ros::NodeHandle nh;
-		ros::Subscriber subImage;
-		uint subImageCount;
+private:
+    ros::NodeHandle nh;
+    ros::Subscriber subImage;
+    uint subImageCount;
 		
-		Mat imgColor;
-		Mat imgGray;
-		Mat imgGrayPrevious;
-		Mat imgCorner;
+    Mat imgColor;
+    Mat imgDepth;
+    Mat imgGray;
+    Mat imgGrayPrevious;
+    Mat imgCorner;
+    fovis_example::DataCapture* cap;
+    fovis::VisualOdometry* odom;
+    
+    int width;
+    int height;
 
-	public:
-	
-	kinectNode(ros::NodeHandle& _nh) {
-		this->nh = _nh;
-		
-		subImageCount = 0;
-		imgColor = Mat(cv::Size(640, 480), CV_8UC3);
-		imgGrayPrevious = Mat(cv::Size(640, 480), CV_8UC1);
-		imgGray = Mat(cv::Size(640, 480), CV_8UC1);
-		
-		//subscribe to the image
-		//subImage = nh.subscribe("/camera/rgb/image_rect", 10, &kinectNode::subImageCallback, this);
-		subImage = nh.subscribe("/camera/depth/image_rect", 10, &kinectNode::subImageCallback, this);
 
-		//Create a cv window to view image in for now
-		cv::namedWindow("Image");
-	}
-	
-	~kinectNode() {
-		cv::destroyWindow("Image");
-		imgColor.release();
-		imgGray.release();
-	}
-	
-	private:
-	
-	void subImageCallback(const sensor_msgs::ImageConstPtr& msg) {
-		
-		subImageCount++;
-		cout << "Got image number: " << subImageCount << endl;
-		
-		//convert image from ROS image message to OpenCV Mat
-		convert_image(msg, imgColor);
-		
-		//cvtColor(imgColor, imgGray, CV_RGB2GRAY);
-		
-		cv::imshow("Image", imgColor);
-		cv::waitKey(1);
-	}
+public:
 
-	void convert_image(const sensor_msgs::ImageConstPtr& _msg, Mat& _img)
+    message_filters::Subscriber<sensor_msgs::Image> sub_rgb;
+    message_filters::Subscriber<sensor_msgs::Image> sub_depth;
+    typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> Policy_sync_subs;
+    message_filters::Synchronizer<Policy_sync_subs> sync_subs;
+
+	
+    kinectNode(ros::NodeHandle& _nh): nh(_nh), sub_rgb(nh, "/camera/rgb/image_rect", 10), sub_depth(nh, "/camera/depth/image_rect", 10), 
+				      sync_subs(Policy_sync_subs(10), sub_rgb, sub_depth) 
 	{
-		cv_bridge::CvImageConstPtr cv_image_ptr;
-		//cv_image_ptr = cv_bridge::toCvShare(_msg, "bgr8");
-		cv_image_ptr = cv_bridge::toCvCopy(_msg, enc::TYPE_32FC1);
-		_img = cv_image_ptr->image;
-		cv::imshow("raw image", cv_image_ptr->image);
-		cv::waitKey(10);
+
+	    this->nh = _nh;
+		
+	    subImageCount = 0;
+	    imgColor = Mat(cv::Size(640, 480), CV_8UC3);
+	    imgDepth = Mat(cv::Size(640, 480), CV_8UC3);
+	    imgGrayPrevious = Mat(cv::Size(640, 480), CV_8UC1);
+	    imgGray = Mat(cv::Size(640, 480), CV_8UC1);
+
+	    width = 640;
+	    height = 480;
+
+
+
+	    cap = new fovis_example::DataCapture();
+	    //if(!cap->initialize()) {
+	    //	fprintf(stderr, "Unable to initialize OpenNI sensor\n");		 
+	    //}
+	
+	    
+	    // get the RGB camera parameters of our device
+	    fovis::Rectification rect(cap->getRgbParameters());
+
+	    fovis::VisualOdometryOptions options = 
+		fovis::VisualOdometry::getDefaultOptions();
+	    // If we wanted to play around with the different VO parameters, we could set
+	    // them here in the "options" variable.
+
+	    // setup the visual odometry
+	    odom = new fovis::VisualOdometry(&rect, options);
+	    
+	    
+
+	    //subscribe to the image
+	    //subImage = nh.subscribe("/camera/rgb/image_rect", 10, &kinectNode::subImageCallback, this);
+	    //subImage = nh.subscribe("/camera/depth/image_rect", 10, &kinectNode::subImageCallback, this);
+
+	    //Create a cv window to view image in for now
+	    sync_subs.registerCallback(boost::bind(&kinectNode::subImageCallback, this, _1, _2));		
+
+	    cv::namedWindow("Image");
+	}
+	
+    ~kinectNode() {
+	cv::destroyWindow("Image");
+	imgColor.release();
+	imgDepth.release();
+	imgGray.release();
+    }
+
+    std::string  isometryToString(const Eigen::Isometry3d& m)
+	{
+	    char result[80];
+	    memset(result, 0, sizeof(result));
+	    Eigen::Vector3d xyz = m.translation();
+	    Eigen::Vector3d rpy = m.rotation().eulerAngles(0, 1, 2);
+	    snprintf(result, 79, "%6.2f %6.2f %6.2f %6.2f %6.2f %6.2f", 
+		     xyz(0), xyz(1), xyz(2), 
+		     rpy(0) * 180/M_PI, rpy(1) * 180/M_PI, rpy(2) * 180/M_PI);
+	    return std::string(result);
+	}
+
+	
+private:
+	
+    void subImageCallback(const sensor_msgs::ImageConstPtr& msg_rgb, const sensor_msgs::ImageConstPtr& msg_depth) {
+		
+	subImageCount++;
+	cout << "Got image number: " << subImageCount << endl;
+		
+	//convert image from ROS image message to OpenCV Mat
+	//convert_rgb_image(msg, imgColor);
+
+	convert_depth_image(msg_depth, imgDepth);
+	convert_rgb_image(msg_rgb, imgColor);
+
+	cv::imshow("rgb image", imgColor);
+	cv::waitKey(1);
+
+	cv::imshow("depth image", imgDepth);
+	cv::waitKey(1);
+	
+
+	//cvtColor(imgColor, imgGray, CV_RGB2GRAY);
+
+	//libfovis processing
+
+	fovis::DepthImage* depth_image = new fovis::DepthImage(cap->getRgbParameters(), width, height);
+	float* depth_data = new float[width * height];
+	uint8_t* gray_buf = new uint8_t[width * height];
+
+	for( int i=0; i<height; i++)
+	{
+	    for( int j=0; j<width; j++)
+	    {
+		depth_data[i*width + j] = imgDepth.at<double>(i,j);
+		gray_buf[i*width + j] = imgColor.at<int>(i,j);
+	    }
+	}
+		
+
+	for(int i=0; i<width*height; i++) {
+	    if(depth_data[i] != 0) {
+		depth_data[i] *= 1e-3;
+	    } else {
+		//depth_data[i] = NAN;
+		depth_data[i] = 0;
+	    }
+	}
+
+	
+	
+
+	depth_image->setDepthImage(depth_data);
+
+	ROS_INFO_STREAM("before");
+	odom->processFrame(gray_buf, depth_image);
+	ROS_INFO_STREAM("after");
+	/*
+	// get the integrated pose estimate.
+	Eigen::Isometry3d cam_to_local = odom->getPose();
+
+	// get the motion estimate for this frame to the previous frame.
+	Eigen::Isometry3d motion_estimate = odom->getMotionEstimate();
+
+	// display the motion estimate.  These values are all given in the RGB
+	// camera frame, where +Z is forward, +X points right, +Y points down, and
+	// the origin is located at the focal point of the RGB camera.
+	std::cout << isometryToString(cam_to_local) << " " << 
+	    isometryToString(motion_estimate) << "\n";
+
+	*/
+	
+
+    }
+
+    void convert_rgb_image(const sensor_msgs::ImageConstPtr& _msg, Mat& _img)
+	{
+	    cv_bridge::CvImageConstPtr cv_image_ptr;
+	    cv_image_ptr = cv_bridge::toCvShare(_msg, "bgr8");
+	    //cv_image_ptr = cv_bridge::toCvCopy(_msg, enc::TYPE_32FC1);
+	    _img = cv_image_ptr->image;
+
+	}
+	
+    void convert_depth_image(const sensor_msgs::ImageConstPtr& _msg, Mat& _img)
+	{
+	    cv_bridge::CvImageConstPtr cv_image_ptr;
+	    //cv_image_ptr = cv_bridge::toCvShare(_msg, "bgr8");
+	    cv_image_ptr = cv_bridge::toCvCopy(_msg, enc::TYPE_32FC1);
+	    _img = cv_image_ptr->image;
 	}
 	
 };
 
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "flash_drive_finder");
-	ros::NodeHandle nh;
+    ros::init(argc, argv, "flash_drive_finder");
+    ros::NodeHandle nh;
 	
-	cout << "Initializing kinectNode..." << endl;
-	kinectNode kinectNode(nh);
-	cout << "Initialization Complete" << endl;
+    ROS_INFO_STREAM("Initializing kinectNode...");
+    kinectNode kinectNode(nh);
+    cout << "Initialization Complete" << endl;
 	
-	ros::spin();
-	return 0;
+    ros::spin();
+    return 0;
 }
 

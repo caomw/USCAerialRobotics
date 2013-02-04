@@ -1,5 +1,0 @@
-<library path="lib/libart_slam">
-  <class name="art_slam/kinect_slam" type="art_slam::KinectSLAM" base_class_type="nodelet::Nodelet">
-  	<description> </description>
-  </class>
-</library>
