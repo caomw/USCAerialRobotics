@@ -61,23 +61,23 @@ class measurement
      float yaw;
 };
 
-class waypoints
-{
-    vector<measurement> measurements;
-    void update(measurement newMeasurement)
-    {
-	if( measurements.size() == 0)
-	    {
-		measurements.push_back(newMeasurement);
-		return;
-	    }
+// class waypoints
+// {
+//     vector<measurement> measurements;
+//     void update(measurement newMeasurement)
+//     {
+// 	if( measurements.size() == 0)
+// 	    {
+// 		measurements.push_back(newMeasurement);
+// 		return;
+// 	    }
 		
 
-	measurement currentMeasurement = measurements(measurements.size()-1);
-    }
+// 	measurement currentMeasurement = measurements(measurements.size()-1);
+//     }
 			   
 	       
-} waypoints;
+// } waypoints;
 
 vector<float> linspace(double min_range, double max_range, int total_no_points)  {
     vector<float> phi = std::vector<float>(total_no_points);
