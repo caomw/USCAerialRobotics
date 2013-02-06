@@ -17,7 +17,7 @@
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include <fovis/fovis.hpp>
-#include "data_capture.hpp"
+
 
 #include <stdio.h>
 #include <stdlib.h>
