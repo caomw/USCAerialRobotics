@@ -16,6 +16,9 @@
 
 #define MIN_VAL(X,Y) ((X < Y) ? (X) : (Y))
 #define MAX_VAL(X,Y) ((X > Y) ? (X) : (Y))
+#define WAYPOINT_THRESHOLD 0.5
+#define REMATCH_CANDIDATE_THRESH 0.3
+#define REMATCH_VALIDATION_THRESH 0.1
 
 using namespace std;
 using namespace Eigen;
@@ -24,8 +27,11 @@ using namespace Eigen;
 bool firstRun = true;
 int est_rot = 0;
 int previous_est_rot = 0;
+int base_rot = 0;
 Vector2f est_translation;
 Vector2f previous_translation;
+Vector2f base_translation;
+Vector2f sourceTranslation;
 
 class line {
 
@@ -55,10 +61,15 @@ public:
 
 class measurement
 {
-     vector<line> lines;
-     float x;
-     float y;
-     float yaw;
+public:
+    vector<line> lines;
+    float x;
+    float y;
+    float yaw;
+    float dist_from(const measurement& other)
+    {
+	return pow(pow(this->x - other.x, 2) + pow(this->y - other.y, 2), 0.5);
+    }
 };
 
 // class waypoints
@@ -79,6 +90,7 @@ class measurement
 	       
 // } waypoints;
 
+
 vector<float> linspace(double min_range, double max_range, int total_no_points)  {
     vector<float> phi = std::vector<float>(total_no_points);
     phi[0] = min_range;
@@ -95,6 +107,7 @@ void compare_scans(boost::shared_ptr<vector<line> > firstScan,
 		   int& rotOut,
 		   Vector2f translation_prior_mean,
 		   Vector2f & translationOut)
+
 {
 		   
     int num_theta_entries = (2 * M_PI - delta_theta*angle_increment)/(delta_theta*M_PI/180) + 1;
@@ -284,7 +297,7 @@ void compare_scans(boost::shared_ptr<vector<line> > firstScan,
 	observed_projection2f(1,0) = observed_projection(1,0);
 	observed_projection2f(1,1) = observed_projection(1,1);
 
-	//translationOut = observed_projection2f * currentTranslation + (previous_translation - observed_projection2f*previous_translation);
+	//translationOut = observed_projection2f * currentTranslation + (sourceTranslation - observed_projection2f*sourceTranslation);
 	translationOut = currentTranslation;
 
 
@@ -293,7 +306,8 @@ void compare_scans(boost::shared_ptr<vector<line> > firstScan,
 						 
 	}
 	cout << endl << "Estimated Rotation:  " << rotOut;
-	cout<< "   Estimated Translation:  " << translationOut(0) << "   " << translationOut(1) << "   MatchedLines: " << matched_lines.size() << endl; 
+	//cout<< "   Estimated Translation:  " << translationOut(0) << "   " << translationOut(1) << "   MatchedLines: " << matched_lines.size() << endl; 
+	cout<< "   Estimated Translation:  " << base_translation(0) + translationOut(0) << "   " << base_translation(1) + translationOut(1) << "   MatchedLines: " << matched_lines.size() << endl; 
 		    
     }
 }      
@@ -309,6 +323,7 @@ public:
 
     double counter;
     boost::shared_ptr<vector<line> > scan1, scan2, original_scan;
+    vector<measurement> base_scans;
 
     Compare(ros::NodeHandle& _nh): nh(_nh) {
 	pub_pos = nh.advertise<geometry_msgs::Point32>("/arduino/pos", 1);
@@ -400,11 +415,70 @@ public:
 	    {
 	
 		compare_scans(scan1, scan2, previous_est_rot, est_rot, previous_translation, est_translation );
+		
+		if( pow(pow(est_translation[0],2) + pow(est_translation[1],2),0.5) > WAYPOINT_THRESHOLD)
+		{
+		    measurement new_base;
+		    for(int i=0; i<scan1->size(); i++)
+		    {
+		    	new_base.lines.push_back(scan1->at(i));
+		    }
+		    new_base.x = base_translation(0) + est_translation(0);
+		    new_base.y = base_translation(1) + est_translation(1);
+		    new_base.yaw = base_rot;
+
+		    // float min_dist = 2*REMATCH_CANDIDATE_THRESH; //start with arbitrarily high value
+		    // int min_index = 0;
+		    // for( int i=0; i<base_scans.size(); i++)
+		    // {
+		    // 	float current_dist = base_scans[i].dist_from(new_base);
+		    // 	if( current_dist < min_dist )
+		    // 	{
+		    // 	    min_index = i;
+		    // 	    min_dist = current_dist;
+		    // 	}
+		    // }
+		    // if(min_dist < REMATCH_CANDIDATE_THRESH)
+		    // {
+		    // 	boost::shared_ptr<vector<line> > temp_boost_scan(new vector<line>);
+		    // 	for(int i=0; i<base_scans[min_index].lines.size(); i++)
+		    // 	{
+		    // 	    temp_boost_scan->push_back(base_scans[min_index].lines[i]);
+		    // 	}
+
+		    // 	int expected_rot_difference = new_base.yaw - base_scans[min_index].yaw;
+		    // 	int actual_rot_difference;
+		    // 	Vector2f expected_translation_difference;
+		    // 	expected_translation_difference << new_base.x - base_scans[min_index].x, new_base.y - base_scans[min_index].y;
+		    // 	Vector2f actual_translation_difference;
+
+		    // 	compare_scans(temp_boost_scan, scan2,
+		    // 		      new_base.yaw - base_scans[min_index].yaw, actual_rot_difference,
+		    // 		      expected_translation_difference, actual_translation_difference );
+		    // 	float translation_error = pow(pow(expected_translation_difference(0) - actual_translation_difference(0), 2) + pow(expected_translation_difference(1) - actual_translation_difference(1),2), 0.5);
+		    // 	if( (translation_error < REMATCH_VALIDATION_THRESH) && (abs(expected_rot_difference - actual_rot_difference) < 7))
+		    // 	{
+		    // 	    //overwrite the new_base values with the difference between the waypoint and the current scan
+		    // 	    new_base.x = base_scans[min_index].x + actual_translation_difference[0];
+		    // 	    new_base.y = base_scans[min_index].y + actual_translation_difference[1];
+		    // 	    new_base.yaw = base_scans[min_index].yaw + actual_rot_difference;
+		    // 	}
+		    // }
+			    
+
+
+		    scan1 = scan2;
+		    base_translation << new_base.x, new_base.y;
+		    base_rot = new_base.yaw;
+		    base_scans.push_back(new_base);		    
+		    est_translation << 0, 0;
+		    est_rot = 0;
+		}
+
 		previous_translation = est_translation;
 		previous_est_rot = est_rot;
-
-		//scan1 = scan2;
-	
+		
+		
 	    }
 
 
