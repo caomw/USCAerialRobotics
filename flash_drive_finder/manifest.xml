@@ -8,14 +8,16 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/flash_drive_finder</url>
+  <depend package="tf"/>
   <depend package="std_msgs"/>
+  <depend package="nav_msgs"/>
   <depend package="roscpp"/>
   <depend package="sensor_msgs"/>
   <depend package="opencv2"/>
   <depend package="cv_bridge"/>
   <depend package="image_transport"/>
   <depend package="message_filters"/>
-  <depend package="cpp11"/>
+
   
 
 </package>

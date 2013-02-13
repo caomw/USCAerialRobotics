@@ -18,6 +18,10 @@
 #include <message_filters/sync_policies/approximate_time.h>
 #include <fovis/fovis.hpp>
 #include "data_capture.hpp"
+#include <tf/tf.h>
+#include <tf/transform_broadcaster.h>
+
+#include <nav_msgs/Odometry.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,6 +56,9 @@ class kinectNode {
 		fovis::Rectification * rect;
 		int width;
 		int height;
+		tf::TransformBroadcaster tf_broadcaster_;
+
+		ros::Publisher odom_pub_;
 
 
 	public:
@@ -68,6 +75,8 @@ class kinectNode {
 	{
 
 		this->nh = _nh;
+
+		odom_pub_ = _nh.advertise<nav_msgs::Odometry>("fovis_odometry", 1000);
 
 		subImageCount = 0;
 		imgColor = Mat(cv::Size(640, 480), CV_8UC3);
@@ -104,11 +113,11 @@ class kinectNode {
 		//Create a cv window to view image in for now
 		sync_subs.registerCallback(boost::bind(&kinectNode::subImageCallback, this, _1, _2));		
 
-		cv::namedWindow("Image");
+		//cv::namedWindow("Image");
 	}
 
 		~kinectNode() {
-			cv::destroyWindow("Image");
+			//cv::destroyWindow("Image");
 			imgColor.release();
 			imgDepth.release();
 			imgGray.release();
@@ -131,7 +140,7 @@ class kinectNode {
 
 		void subImageCallback(const sensor_msgs::ImageConstPtr& msg_rgb, const sensor_msgs::ImageConstPtr& msg_depth) {
 
-			std::cout << "GOT A NEW DEPTH IMAGE: " << msg_depth->encoding << " !!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+			std::cout << "Image Callback: " << msg_rgb->header.stamp << " | " << msg_depth->header.stamp << std::endl;
 
 			subImageCount++;
 			cout << "Got image number: " << subImageCount << endl;
@@ -142,14 +151,14 @@ class kinectNode {
 			convert_depth_image(msg_depth, imgDepth);
 			convert_rgb_image(msg_rgb, imgColor);
 
-			cv::imshow("rgb image", imgColor);
-			cv::waitKey(1);
+			//cv::imshow("rgb image", imgColor);
+			//cv::waitKey(1);
 
-			cv::imshow("depth image", imgDepth);
-			cv::waitKey(1);
+			//cv::imshow("depth image", imgDepth);
+			//cv::waitKey(1);
 
 			cvtColor(imgColor, imgGray, CV_RGB2GRAY);
-			
+
 			// float* depth_data = new float[width*height];
 			// depth_data = reinterpret_cast<float*>(imgDepth.data);
 			// for( int i=0; i<width*height; i++)
@@ -163,6 +172,42 @@ class kinectNode {
 
 			Eigen::Isometry3d cam_to_local = odom->getPose();
 			Eigen::Isometry3d motion_estimate = odom->getMotionEstimate();
+
+			Eigen::Quaterniond quat(cam_to_local.rotation());
+			Eigen::Vector3d trans(cam_to_local.translation());
+
+			tf::StampedTransform transform;
+
+			btQuaternion btquat;
+			btquat.setX(quat.x());
+			btquat.setY(quat.y());
+			btquat.setZ(quat.z());
+			btquat.setW(quat.w());
+
+			btVector3 bttranslation;
+			bttranslation.setX(trans.x());
+			bttranslation.setY(trans.y());
+			bttranslation.setZ(trans.z());
+
+			btTransform btTrans(btquat, bttranslation);
+
+			tf::StampedTransform stampedtrans(btTrans, ros::Time::now(), "/world", "/fovis_frame");
+			tf_broadcaster_.sendTransform(stampedtrans);
+
+
+			nav_msgs::Odometry odom_msg;
+			odom_msg.header.frame_id = "kinect";
+			odom_msg.header.stamp = ros::Time::now();
+			odom_msg.pose.pose.position.x = cam_to_local.translation().x();
+			odom_msg.pose.pose.position.y = cam_to_local.translation().y();
+			odom_msg.pose.pose.position.z = cam_to_local.translation().z();
+
+			odom_msg.pose.pose.orientation.w = quat.w();
+			odom_msg.pose.pose.orientation.x = quat.x();
+			odom_msg.pose.pose.orientation.y = quat.y();
+			odom_msg.pose.pose.orientation.z = quat.z();
+
+			odom_pub_.publish(odom_msg);
 
 			std::cout << isometryToString(cam_to_local) << " " << isometryToString(motion_estimate) << "\n";
 			//delete[] depth_data;
@@ -190,14 +235,14 @@ class kinectNode {
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "flash_drive_finder");
-    ros::NodeHandle nh;
-	
-    ROS_INFO_STREAM("Initializing kinectNode...");
-    kinectNode kinectNode(nh);
-    cout << "Initialization Complete" << endl;
-	
-    ros::spin();
-    return 0;
+	ros::init(argc, argv, "flash_drive_finder");
+	ros::NodeHandle nh;
+
+	ROS_INFO_STREAM("Initializing kinectNode...");
+	kinectNode kinectNode(nh);
+	cout << "Initialization Complete" << endl;
+
+	ros::spin();
+	return 0;
 }
 
