@@ -32,10 +32,10 @@ CMAKE_COMMAND = /usr/bin/cmake
 RM = /usr/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/macuser/ROS/beohawk-ros/art_lrf
+CMAKE_SOURCE_DIR = /home/art/ROS/USCAerialRobotics/art_lrf
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/macuser/ROS/beohawk-ros/art_lrf
+CMAKE_BINARY_DIR = /home/art/ROS/USCAerialRobotics/art_lrf
 
 # Include any dependencies generated for this target.
 include CMakeFiles/line_finder.dir/depend.make
@@ -86,17 +86,17 @@ CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg_gen/generated
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/common_msgs/sensor_msgs/msg_gen/generated
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/common_msgs/sensor_msgs/srv_gen/generated
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/macuser/ROS/beohawk-ros/art_lrf/CMakeFiles $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/art/ROS/USCAerialRobotics/art_lrf/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/line_finder.dir/src/line_finder.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread -o CMakeFiles/line_finder.dir/src/line_finder.o -c /home/macuser/ROS/beohawk-ros/art_lrf/src/line_finder.cpp
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread -o CMakeFiles/line_finder.dir/src/line_finder.o -c /home/art/ROS/USCAerialRobotics/art_lrf/src/line_finder.cpp
 
 CMakeFiles/line_finder.dir/src/line_finder.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/line_finder.dir/src/line_finder.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread -E /home/macuser/ROS/beohawk-ros/art_lrf/src/line_finder.cpp > CMakeFiles/line_finder.dir/src/line_finder.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread -E /home/art/ROS/USCAerialRobotics/art_lrf/src/line_finder.cpp > CMakeFiles/line_finder.dir/src/line_finder.i
 
 CMakeFiles/line_finder.dir/src/line_finder.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/line_finder.dir/src/line_finder.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread -S /home/macuser/ROS/beohawk-ros/art_lrf/src/line_finder.cpp -o CMakeFiles/line_finder.dir/src/line_finder.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread -S /home/art/ROS/USCAerialRobotics/art_lrf/src/line_finder.cpp -o CMakeFiles/line_finder.dir/src/line_finder.s
 
 CMakeFiles/line_finder.dir/src/line_finder.o.requires:
 .PHONY : CMakeFiles/line_finder.dir/src/line_finder.o.requires
@@ -132,6 +132,6 @@ CMakeFiles/line_finder.dir/clean:
 .PHONY : CMakeFiles/line_finder.dir/clean
 
 CMakeFiles/line_finder.dir/depend:
-	cd /home/macuser/ROS/beohawk-ros/art_lrf && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/macuser/ROS/beohawk-ros/art_lrf /home/macuser/ROS/beohawk-ros/art_lrf /home/macuser/ROS/beohawk-ros/art_lrf /home/macuser/ROS/beohawk-ros/art_lrf /home/macuser/ROS/beohawk-ros/art_lrf/CMakeFiles/line_finder.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/art/ROS/USCAerialRobotics/art_lrf && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/art/ROS/USCAerialRobotics/art_lrf /home/art/ROS/USCAerialRobotics/art_lrf /home/art/ROS/USCAerialRobotics/art_lrf /home/art/ROS/USCAerialRobotics/art_lrf /home/art/ROS/USCAerialRobotics/art_lrf/CMakeFiles/line_finder.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/line_finder.dir/depend
 

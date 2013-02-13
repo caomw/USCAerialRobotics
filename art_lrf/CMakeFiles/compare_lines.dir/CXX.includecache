@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/macuser/ROS/beohawk-ros/art_lrf/src/compare_lines.cpp
+/home/art/ROS/USCAerialRobotics/art_lrf/src/compare_lines.cpp
 ros/ros.h
 -
 sensor_msgs/LaserScan.h

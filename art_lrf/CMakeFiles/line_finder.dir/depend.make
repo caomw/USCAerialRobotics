@@ -4,8 +4,6 @@
 CMakeFiles/line_finder.dir/src/line_finder.o: src/line_finder.cpp
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg_gen/cpp/include/geometry_msgs/Point32.h
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg_gen/cpp/include/geometry_msgs/Polygon.h
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg_gen/cpp/include/geometry_msgs/Vector3.h
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg_gen/cpp/include/geometry_msgs/Vector3Stamped.h
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/common_msgs/sensor_msgs/msg_gen/cpp/include/sensor_msgs/ChannelFloat32.h
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/common_msgs/sensor_msgs/msg_gen/cpp/include/sensor_msgs/LaserScan.h
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/common_msgs/sensor_msgs/msg_gen/cpp/include/sensor_msgs/PointCloud.h
@@ -50,10 +48,8 @@ CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp_traits/include/ros/message_traits.h
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp_traits/include/ros/service_traits.h
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/messages/std_msgs/include/std_msgs/header_deprecated_def.h
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/messages/std_msgs/msg_gen/cpp/include/std_msgs/Float32MultiArray.h
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/messages/std_msgs/msg_gen/cpp/include/std_msgs/Header.h
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/messages/std_msgs/msg_gen/cpp/include/std_msgs/MultiArrayDimension.h
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/messages/std_msgs/msg_gen/cpp/include/std_msgs/MultiArrayLayout.h
+CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/messages/std_msgs/msg_gen/cpp/include/std_msgs/Int32.h
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/tools/rosconsole/include/ros/assert.h
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/tools/rosconsole/include/ros/console.h
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/tools/rosconsole/include/ros/static_assert.h
@@ -62,14 +58,6 @@ CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/cpp_common/include/ros/macros.h
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/cpp_common/include/ros/platform.h
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/cpp_common/include/ros/types.h
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/message_filters/include/message_filters/connection.h
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/message_filters/include/message_filters/null_types.h
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/message_filters/include/message_filters/signal1.h
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/message_filters/include/message_filters/signal9.h
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/message_filters/include/message_filters/simple_filter.h
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/message_filters/include/message_filters/subscriber.h
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/message_filters/include/message_filters/sync_policies/approximate_time.h
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/message_filters/include/message_filters/synchronizer.h
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/rostime/include/ros/duration.h
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/rostime/include/ros/rate.h
 CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/rostime/include/ros/rostime_decl.h

@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/macuser/ROS/beohawk-ros/art_lrf/src/odometry.cpp
+/home/art/ROS/USCAerialRobotics/art_lrf/src/odometry.cpp
 ros/ros.h
 -
 sensor_msgs/LaserScan.h
@@ -26,7 +26,7 @@ boost/shared_ptr.hpp
 art_lrf/Lines.h
 -
 odometry.h
-/home/macuser/ROS/beohawk-ros/art_lrf/src/odometry.h
+/home/art/ROS/USCAerialRobotics/art_lrf/src/odometry.h
 Eigen/Eigen
 -
 cmath
@@ -36,7 +36,7 @@ vector
 iostream
 -
 
-/home/macuser/ROS/beohawk-ros/art_lrf/src/odometry.h
+/home/art/ROS/USCAerialRobotics/art_lrf/src/odometry.h
 
 /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg_gen/cpp/include/geometry_msgs/Point32.h
 string

@@ -32,15 +32,15 @@ CMAKE_COMMAND = /usr/bin/cmake
 RM = /usr/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/macuser/ROS/beohawk-ros/art_lrf
+CMAKE_SOURCE_DIR = /home/art/ROS/USCAerialRobotics/art_lrf
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/macuser/ROS/beohawk-ros/art_lrf
+CMAKE_BINARY_DIR = /home/art/ROS/USCAerialRobotics/art_lrf
 
 # Utility rule file for clean-test-results.
 
 CMakeFiles/clean-test-results:
-	if ! rm -rf /home/macuser/.ros/test_results/art_lrf; then echo WARNING:\ failed\ to\ remove\ test-results\ directory ; fi
+	if ! rm -rf /home/art/.ros/test_results/art_lrf; then echo WARNING:\ failed\ to\ remove\ test-results\ directory ; fi
 
 clean-test-results: CMakeFiles/clean-test-results
 clean-test-results: CMakeFiles/clean-test-results.dir/build.make
@@ -55,6 +55,6 @@ CMakeFiles/clean-test-results.dir/clean:
 .PHONY : CMakeFiles/clean-test-results.dir/clean
 
 CMakeFiles/clean-test-results.dir/depend:
-	cd /home/macuser/ROS/beohawk-ros/art_lrf && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/macuser/ROS/beohawk-ros/art_lrf /home/macuser/ROS/beohawk-ros/art_lrf /home/macuser/ROS/beohawk-ros/art_lrf /home/macuser/ROS/beohawk-ros/art_lrf /home/macuser/ROS/beohawk-ros/art_lrf/CMakeFiles/clean-test-results.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/art/ROS/USCAerialRobotics/art_lrf && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/art/ROS/USCAerialRobotics/art_lrf /home/art/ROS/USCAerialRobotics/art_lrf /home/art/ROS/USCAerialRobotics/art_lrf /home/art/ROS/USCAerialRobotics/art_lrf /home/art/ROS/USCAerialRobotics/art_lrf/CMakeFiles/clean-test-results.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/clean-test-results.dir/depend
 
