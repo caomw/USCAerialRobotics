@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/russell/ros/USCAerialRobotics/icp_lrf/devel/setup.sh
