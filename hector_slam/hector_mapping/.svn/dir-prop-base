@@ -1,9 +1,0 @@
-K 10
-svn:ignore
-V 38
-build
-msg_gen
-CMakeLists.txt.user
-bin
-
-END

@@ -1,5 +1,0 @@
-<library path="lib/libart_visualization">
-  <class name="art_visualization/pub_points" type="art_visualization::PubPoints" base_class_type="nodelet::Nodelet">
-  	<description> </description>
-  </class>
-</library>

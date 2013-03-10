@@ -1,5 +1,0 @@
-<library path="lib/libart_window">
-  <class name="art_window/window_pose" type="art_window::WindowPose" base_class_type="nodelet::Nodelet">
-  	<description> </description>
-  </class>
-</library>
