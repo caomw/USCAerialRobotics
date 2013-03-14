@@ -1,7 +1,6 @@
 FILE(REMOVE_RECURSE
+  "msg_gen"
   "src/art_lrf/msg"
-  "msg_gen"
-  "msg_gen"
   "CMakeFiles/ROSBUILD_genmsg_cpp"
   "msg_gen/cpp/include/art_lrf/Lines.h"
 )

@@ -1,8 +1,7 @@
 FILE(REMOVE_RECURSE
+  "msg_gen"
   "src/art_lrf/msg"
-  "msg_gen"
-  "msg_gen"
-  "CMakeFiles/line_finder.dir/src/line_finder.o"
+  "CMakeFiles/line_finder.dir/src/line_finder.cpp.o"
   "bin/line_finder.pdb"
   "bin/line_finder"
 )

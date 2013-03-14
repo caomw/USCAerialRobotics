@@ -18,8 +18,11 @@
 #define PI 3.141592
 #endif
 
-#define WAYPOINT_DIST_THRESH 0.3
-#define WAYPOINT_ANGLE_THRESH 30*PI/180
+#define WAYPOINT_DIST_THRESH 0.1
+#define WAYPOINT_ANGLE_THRESH 20*PI/180
+#define ICP_MAX_ITERATIONS 50
+#define ICP_MAX_CORRESPONDENCE_DISTANCE 0.05
+
 
 using namespace std;
 using namespace Eigen;
@@ -99,7 +102,6 @@ public:
 	double min_angle = msg_lrf->angle_min;
 	double max_angle = msg_lrf->angle_max;
 	double angle_increment = msg_lrf->angle_increment;
-
 
 	current_scan.ranges.clear();
 	for(int i = 0; i < msg_lrf->ranges.size(); i++) {
@@ -227,6 +229,8 @@ void updateTransform(scan& base,
     pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
     icp.setInputCloud(cloud_in);
     icp.setInputTarget(cloud_out);
+    icp.setMaximumIterations(ICP_MAX_ITERATIONS);
+    icp.setMaxCorrespondenceDistance(ICP_MAX_CORRESPONDENCE_DISTANCE);
     pcl::PointCloud<pcl::PointXYZ> Final;
     icp.align(Final);
     std::cout << "has converged:" << icp.hasConverged() << " score: " <<

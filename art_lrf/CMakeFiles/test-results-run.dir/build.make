@@ -4,7 +4,7 @@
 #=============================================================================
 # Special targets provided by cmake.
 
-# Disable implicit rules so canoncical targets will work.
+# Disable implicit rules so canonical targets will work.
 .SUFFIXES:
 
 # Remove some rules from gmake that .SUFFIXES does not remove.
@@ -32,12 +32,15 @@ CMAKE_COMMAND = /usr/bin/cmake
 RM = /usr/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/art/ROS/USCAerialRobotics/art_lrf
+CMAKE_SOURCE_DIR = /home/russell/ros/USCAerialRobotics/art_lrf
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/art/ROS/USCAerialRobotics/art_lrf
+CMAKE_BINARY_DIR = /home/russell/ros/USCAerialRobotics/art_lrf
 
 # Utility rule file for test-results-run.
+
+# Include the progress variables for this target.
+include CMakeFiles/test-results-run.dir/progress.make
 
 CMakeFiles/test-results-run:
 
@@ -54,6 +57,6 @@ CMakeFiles/test-results-run.dir/clean:
 .PHONY : CMakeFiles/test-results-run.dir/clean
 
 CMakeFiles/test-results-run.dir/depend:
-	cd /home/art/ROS/USCAerialRobotics/art_lrf && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/art/ROS/USCAerialRobotics/art_lrf /home/art/ROS/USCAerialRobotics/art_lrf /home/art/ROS/USCAerialRobotics/art_lrf /home/art/ROS/USCAerialRobotics/art_lrf /home/art/ROS/USCAerialRobotics/art_lrf/CMakeFiles/test-results-run.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/russell/ros/USCAerialRobotics/art_lrf && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/russell/ros/USCAerialRobotics/art_lrf /home/russell/ros/USCAerialRobotics/art_lrf /home/russell/ros/USCAerialRobotics/art_lrf /home/russell/ros/USCAerialRobotics/art_lrf /home/russell/ros/USCAerialRobotics/art_lrf/CMakeFiles/test-results-run.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/test-results-run.dir/depend
 

@@ -137,6 +137,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named IMU_odom
+
+# Build rule for target.
+IMU_odom: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 IMU_odom
+.PHONY : IMU_odom
+
+# fast build rule for target.
+IMU_odom/fast:
+	$(MAKE) -f CMakeFiles/IMU_odom.dir/build.make CMakeFiles/IMU_odom.dir/build
+.PHONY : IMU_odom/fast
+
+#=============================================================================
 # Target rules for targets named ROSBUILD_genmsg_cpp
 
 # Build rule for target.
@@ -213,19 +226,6 @@ icp_odom: cmake_check_build_system
 icp_odom/fast:
 	$(MAKE) -f CMakeFiles/icp_odom.dir/build.make CMakeFiles/icp_odom.dir/build
 .PHONY : icp_odom/fast
-
-#=============================================================================
-# Target rules for targets named iterative_closest_point
-
-# Build rule for target.
-iterative_closest_point: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 iterative_closest_point
-.PHONY : iterative_closest_point
-
-# fast build rule for target.
-iterative_closest_point/fast:
-	$(MAKE) -f CMakeFiles/iterative_closest_point.dir/build.make CMakeFiles/iterative_closest_point.dir/build
-.PHONY : iterative_closest_point/fast
 
 #=============================================================================
 # Target rules for targets named rosbuild_clean-test-results
@@ -422,29 +422,29 @@ gtest_main/fast:
 	$(MAKE) -f gtest/CMakeFiles/gtest_main.dir/build.make gtest/CMakeFiles/gtest_main.dir/build
 .PHONY : gtest_main/fast
 
-src/icp.o: src/icp.cpp.o
-.PHONY : src/icp.o
+src/IMU_odom.o: src/IMU_odom.cpp.o
+.PHONY : src/IMU_odom.o
 
 # target to build an object file
-src/icp.cpp.o:
-	$(MAKE) -f CMakeFiles/iterative_closest_point.dir/build.make CMakeFiles/iterative_closest_point.dir/src/icp.cpp.o
-.PHONY : src/icp.cpp.o
+src/IMU_odom.cpp.o:
+	$(MAKE) -f CMakeFiles/IMU_odom.dir/build.make CMakeFiles/IMU_odom.dir/src/IMU_odom.cpp.o
+.PHONY : src/IMU_odom.cpp.o
 
-src/icp.i: src/icp.cpp.i
-.PHONY : src/icp.i
+src/IMU_odom.i: src/IMU_odom.cpp.i
+.PHONY : src/IMU_odom.i
 
 # target to preprocess a source file
-src/icp.cpp.i:
-	$(MAKE) -f CMakeFiles/iterative_closest_point.dir/build.make CMakeFiles/iterative_closest_point.dir/src/icp.cpp.i
-.PHONY : src/icp.cpp.i
+src/IMU_odom.cpp.i:
+	$(MAKE) -f CMakeFiles/IMU_odom.dir/build.make CMakeFiles/IMU_odom.dir/src/IMU_odom.cpp.i
+.PHONY : src/IMU_odom.cpp.i
 
-src/icp.s: src/icp.cpp.s
-.PHONY : src/icp.s
+src/IMU_odom.s: src/IMU_odom.cpp.s
+.PHONY : src/IMU_odom.s
 
 # target to generate assembly for a file
-src/icp.cpp.s:
-	$(MAKE) -f CMakeFiles/iterative_closest_point.dir/build.make CMakeFiles/iterative_closest_point.dir/src/icp.cpp.s
-.PHONY : src/icp.cpp.s
+src/IMU_odom.cpp.s:
+	$(MAKE) -f CMakeFiles/IMU_odom.dir/build.make CMakeFiles/IMU_odom.dir/src/IMU_odom.cpp.s
+.PHONY : src/IMU_odom.cpp.s
 
 src/icp_odom.o: src/icp_odom.cpp.o
 .PHONY : src/icp_odom.o
@@ -476,6 +476,7 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... IMU_odom"
 	@echo "... ROSBUILD_genmsg_cpp"
 	@echo "... ROSBUILD_genmsg_py"
 	@echo "... ROSBUILD_gensrv_cpp"
@@ -486,7 +487,6 @@ help:
 	@echo "... install"
 	@echo "... install/local"
 	@echo "... install/strip"
-	@echo "... iterative_closest_point"
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... rosbuild_clean-test-results"
@@ -504,9 +504,9 @@ help:
 	@echo "... tests"
 	@echo "... gtest"
 	@echo "... gtest_main"
-	@echo "... src/icp.o"
-	@echo "... src/icp.i"
-	@echo "... src/icp.s"
+	@echo "... src/IMU_odom.o"
+	@echo "... src/IMU_odom.i"
+	@echo "... src/IMU_odom.s"
 	@echo "... src/icp_odom.o"
 	@echo "... src/icp_odom.i"
 	@echo "... src/icp_odom.s"

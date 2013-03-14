@@ -1,7 +1,6 @@
 FILE(REMOVE_RECURSE
+  "msg_gen"
   "src/art_lrf/msg"
-  "msg_gen"
-  "msg_gen"
   "CMakeFiles/test-results-run"
 )
 

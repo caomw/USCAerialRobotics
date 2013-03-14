@@ -31,9 +31,10 @@ include_directories(${EIGEN_INCLUDE_DIRS})
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 rosbuild_add_executable(icp_odom src/icp_odom.cpp)
+rosbuild_add_executable(IMU_odom src/IMU_odom.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
-project(iterative_closest_point)
+#project(iterative_closest_point)
 
 find_package(PCL 1.2 REQUIRED)
 
@@ -41,6 +42,8 @@ include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-add_executable (iterative_closest_point src/icp.cpp)
-target_link_libraries (iterative_closest_point ${PCL_LIBRARIES})
+#add_executable (iterative_closest_point src/icp.cpp)
+#target_link_libraries (iterative_closest_point ${PCL_LIBRARIES})
+
 target_link_libraries (icp_odom ${PCL_LIBRARIES})
+target_link_libraries (IMU_odom ${PCL_LIBRARIES})

@@ -1,8 +1,7 @@
 FILE(REMOVE_RECURSE
+  "msg_gen"
   "src/art_lrf/msg"
-  "msg_gen"
-  "msg_gen"
-  "CMakeFiles/odometry.dir/src/odometry.o"
+  "CMakeFiles/odometry.dir/src/odometry.cpp.o"
   "bin/odometry.pdb"
   "bin/odometry"
 )
