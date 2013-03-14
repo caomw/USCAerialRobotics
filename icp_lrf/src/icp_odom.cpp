@@ -43,30 +43,58 @@ struct scan
 	}
 	this->transform = src-> transform;
     }
-
+    void resetTransform()
+    {
+	this->transform << 1, 0, 0, 0,
+                           0, 1, 0, 0,
+	                   0, 0, 1, 0,
+	                   0, 0, 0, 1;
+    }
+	    
 };
 
 void updateTransform(scan& base, 
 		     scan& target);
 
-float getMin(vector<float> v)
+int argmin(vector<float> v)
 {
     float x = v[0];
+    int index = 0;
     for( int i=0; i<v.size(); i++)
     {
-	x = x<v[i]?x:v[i];
+	index = v[i]<x?i:index;
+	x =     v[i]<x?v[i]:x;
     }
-    return x;
+    return index;
+}
+
+template<class T>
+int sign(T x)
+{
+    return x>=0?1:-1;
 }
 
 float angleDist(float theta, float phi)
 {
     vector<float> v;
-    v.push_back(abs(theta-phi        ));
-    v.push_back(abs(theta-phi - 2*PI));
-    v.push_back(abs(theta-phi + 2*PI));
+    vector<float> w;
 
-    return getMin(v);
+    v.push_back(theta-phi       );
+    v.push_back(theta-phi - 2*PI);
+    v.push_back(theta-phi + 2*PI);
+
+    w.push_back(abs(v[0]));
+    w.push_back(abs(v[1]));
+    w.push_back(abs(v[2]));
+
+    for( int i=0; i<w.size(); i++)
+    {
+	cout << w[i] << endl;
+    }
+
+    cout << argmin(w) << endl;
+
+    return v[argmin(w)];
 }
 
 	
@@ -122,47 +150,47 @@ public:
 		base_scan.ranges.push_back(current_scan.ranges[i]);
 	    }
 	    first_execution = false;
-	    base_scan.transform << 1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1;
-	    current_scan.transform << 1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1;
+	    base_scan.resetTransform();
+	    current_scan.resetTransform();
 	} 
 	else
 	{
 	    
+
+	    std::cout << "base_size:" << base_scan.ranges.size() << std::endl;
+	    std::cout << "target_size:" << current_scan.ranges.size() << std::endl;
+
 	    updateTransform(base_scan, current_scan);
+	    cout << "base_scan: " << endl << base_scan.transform << endl << endl;
+	    cout << "current_scan: " << endl << current_scan.transform << endl << endl;
 
 	    // float angle_diff = angleDist(atan2(base_scan.transform(1,0)   , base_scan.transform(0, 0)),
 	    // 				 atan2(current_scan.transform(1,0), current_scan.transform(0, 0)));
-	    float angle_diff = angleDist(0,
-	    				 atan2(current_scan.transform(1,0), current_scan.transform(0, 0)));
+	    float angle_diff = angleDist(atan2(current_scan.transform(1,0), current_scan.transform(0, 0)), 0);
+	    float base_angle = 		 atan2(base_scan.transform(1,0), base_scan.transform(0, 0)) + angle_diff;
 
 	    cout << "angle_diff = " << angle_diff*180/PI << endl;
+	    cout << "base_angle = " << base_angle*180/PI << endl;
+	    
 
-	    // if( (pow(pow(base_scan.transform(0,3) - current_scan.transform(0,3),2) +
-	    // 	     pow(base_scan.transform(1,3) - current_scan.transform(1,3),2) ,0.5) >
-	    // 	 WAYPOINT_DIST_THRESH) || 
-	    // 	(angle_diff > WAYPOINT_ANGLE_THRESH) )
-	    // {
-	    // 	cout << endl << endl << "New base scan detected !!!!!!!!!!!!!!!!!!!!" << endl << endl << endl;
+	    if( (pow(pow(current_scan.transform(0,3),2) +
+	    	     pow(current_scan.transform(1,3),2) ,0.5) >
+	    	 WAYPOINT_DIST_THRESH) || 
+	    	(abs(angle_diff) > WAYPOINT_ANGLE_THRESH) )
+	    {
+	    	cout << endl << endl << "New base scan detected !!!!!!!!!!!!!!!!!!!!" << endl << endl << endl;
 
-	    // 	scan new_base;
-	    // 	for(int i=0; i<current_scan.ranges.size(); i++)
-	    // 	{
-	    // 	    new_base.ranges.push_back(current_scan.ranges[i]);
-	    // 	}
-	    // 	new_base.transform = current_scan.transform * base_scan.transform;
-	    // 	current_scan.transform << 1, 0, 0, 0,
-	    // 	    0, 1, 0, 0,
-	    // 	    0, 0, 1, 0,
-	    // 	    0, 0, 0, 1;
+		base_scan.ranges.clear();
+	    	for(int i=0; i<current_scan.ranges.size(); i++)
+	    	{
+	    	    base_scan.ranges.push_back(current_scan.ranges[i]);
+	    	}
+	    	base_scan.transform = current_scan.transform * base_scan.transform;
+	    	current_scan.resetTransform();
+	
+	     }
 
-	    // 	base_scan.copyFrom(&new_base);
-	    //  }
+
     	}
 
 
@@ -204,7 +232,7 @@ void updateTransform(scan& base,
 	Vector4f ego_base;
 	Vector4f allo_base;
 	ego_base << base.ranges[i].x, base.ranges[i].y, base.ranges[i].z, 1;
-	allo_base = target.transform * base.transform * ego_base;
+	allo_base = target.transform * ego_base;
 	
 	cloud_in->points[i].x = allo_base(0);
 	cloud_in->points[i].y = allo_base(1);
@@ -223,8 +251,6 @@ void updateTransform(scan& base,
 	cloud_out->points[i].z = target.ranges[i].z;
     }
 
-    std::cout << "base_size:" << cloud_in->points.size() << std::endl;
-    std::cout << "target_size:" << cloud_out->points.size() << std::endl;
 
     pcl::IterativeClosestPoint<pcl::PointXYZ, pcl::PointXYZ> icp;
     icp.setInputCloud(cloud_in);
@@ -237,5 +263,5 @@ void updateTransform(scan& base,
 	icp.getFitnessScore() << std::endl; 
     //std::cout << icp.getFinalTransformation() << std::endl;
     target.transform *= icp.getFinalTransformation();
-    std::cout << target.transform * base.transform << std::endl;
+    //std::cout << target.transform * base.transform << std::endl;
 }
