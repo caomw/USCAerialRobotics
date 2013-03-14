@@ -1,8 +1,7 @@
 FILE(REMOVE_RECURSE
+  "msg_gen"
   "src/art_lrf/msg"
-  "msg_gen"
-  "msg_gen"
-  "CMakeFiles/compare_lines.dir/src/compare_lines.o"
+  "CMakeFiles/compare_lines.dir/src/compare_lines.cpp.o"
   "bin/compare_lines.pdb"
   "bin/compare_lines"
 )

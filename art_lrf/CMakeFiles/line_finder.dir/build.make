@@ -4,7 +4,7 @@
 #=============================================================================
 # Special targets provided by cmake.
 
-# Disable implicit rules so canoncical targets will work.
+# Disable implicit rules so canonical targets will work.
 .SUFFIXES:
 
 # Remove some rules from gmake that .SUFFIXES does not remove.
@@ -32,10 +32,10 @@ CMAKE_COMMAND = /usr/bin/cmake
 RM = /usr/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/art/ROS/USCAerialRobotics/art_lrf
+CMAKE_SOURCE_DIR = /home/russell/ros/USCAerialRobotics/art_lrf
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/art/ROS/USCAerialRobotics/art_lrf
+CMAKE_BINARY_DIR = /home/russell/ros/USCAerialRobotics/art_lrf
 
 # Include any dependencies generated for this target.
 include CMakeFiles/line_finder.dir/depend.make
@@ -46,75 +46,59 @@ include CMakeFiles/line_finder.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/line_finder.dir/flags.make
 
-CMakeFiles/line_finder.dir/src/line_finder.o: CMakeFiles/line_finder.dir/flags.make
-CMakeFiles/line_finder.dir/src/line_finder.o: src/line_finder.cpp
-CMakeFiles/line_finder.dir/src/line_finder.o: manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/ros/core/rosbuild/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/ros/core/roslang/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/cpp_common/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp_traits/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/rostime/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp_serialization/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/ros/tools/rospack/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/ros/core/roslib/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/xmlrpcpp/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/tools/rosconsole/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/messages/std_msgs/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/messages/rosgraph_msgs/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/clients/rospy/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/ros/tools/rosclean/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/tools/rosgraph/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/tools/rosparam/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/tools/rosmaster/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/tools/rosout/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/tools/roslaunch/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/ros/tools/rosunit/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/tools/rostest/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/tools/topic_tools/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/tools/rosbag/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/tools/rosbagmigration/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/common_msgs/geometry_msgs/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/common_msgs/sensor_msgs/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/utilities/message_filters/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/common_rosdeps/manifest.xml
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/messages/std_msgs/msg_gen/generated
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/messages/rosgraph_msgs/msg_gen/generated
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp/msg_gen/generated
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/clients/cpp/roscpp/srv_gen/generated
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/ros_comm/tools/topic_tools/srv_gen/generated
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/common_msgs/geometry_msgs/msg_gen/generated
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/common_msgs/sensor_msgs/msg_gen/generated
-CMakeFiles/line_finder.dir/src/line_finder.o: /opt/ros/electric/stacks/common_msgs/sensor_msgs/srv_gen/generated
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/art/ROS/USCAerialRobotics/art_lrf/CMakeFiles $(CMAKE_PROGRESS_1)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/line_finder.dir/src/line_finder.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread -o CMakeFiles/line_finder.dir/src/line_finder.o -c /home/art/ROS/USCAerialRobotics/art_lrf/src/line_finder.cpp
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: CMakeFiles/line_finder.dir/flags.make
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: src/line_finder.cpp
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: manifest.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/cpp_common/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/rostime/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/roscpp_traits/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/roscpp_serialization/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/genmsg/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/genpy/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/message_runtime/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/rosconsole/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/std_msgs/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/rosgraph_msgs/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/xmlrpcpp/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/roscpp/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/geometry_msgs/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/sensor_msgs/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/message_filters/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/stacks/common_rosdeps/manifest.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/rosgraph/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/catkin/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/rospack/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/roslib/package.xml
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o: /opt/ros/groovy/share/rospy/package.xml
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/russell/ros/USCAerialRobotics/art_lrf/CMakeFiles $(CMAKE_PROGRESS_1)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/line_finder.dir/src/line_finder.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread -o CMakeFiles/line_finder.dir/src/line_finder.cpp.o -c /home/russell/ros/USCAerialRobotics/art_lrf/src/line_finder.cpp
 
-CMakeFiles/line_finder.dir/src/line_finder.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/line_finder.dir/src/line_finder.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread -E /home/art/ROS/USCAerialRobotics/art_lrf/src/line_finder.cpp > CMakeFiles/line_finder.dir/src/line_finder.i
+CMakeFiles/line_finder.dir/src/line_finder.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/line_finder.dir/src/line_finder.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread -E /home/russell/ros/USCAerialRobotics/art_lrf/src/line_finder.cpp > CMakeFiles/line_finder.dir/src/line_finder.cpp.i
 
-CMakeFiles/line_finder.dir/src/line_finder.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/line_finder.dir/src/line_finder.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread -S /home/art/ROS/USCAerialRobotics/art_lrf/src/line_finder.cpp -o CMakeFiles/line_finder.dir/src/line_finder.s
+CMakeFiles/line_finder.dir/src/line_finder.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/line_finder.dir/src/line_finder.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -W -Wall -Wno-unused-parameter -fno-strict-aliasing -pthread -S /home/russell/ros/USCAerialRobotics/art_lrf/src/line_finder.cpp -o CMakeFiles/line_finder.dir/src/line_finder.cpp.s
 
-CMakeFiles/line_finder.dir/src/line_finder.o.requires:
-.PHONY : CMakeFiles/line_finder.dir/src/line_finder.o.requires
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o.requires:
+.PHONY : CMakeFiles/line_finder.dir/src/line_finder.cpp.o.requires
 
-CMakeFiles/line_finder.dir/src/line_finder.o.provides: CMakeFiles/line_finder.dir/src/line_finder.o.requires
-	$(MAKE) -f CMakeFiles/line_finder.dir/build.make CMakeFiles/line_finder.dir/src/line_finder.o.provides.build
-.PHONY : CMakeFiles/line_finder.dir/src/line_finder.o.provides
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o.provides: CMakeFiles/line_finder.dir/src/line_finder.cpp.o.requires
+	$(MAKE) -f CMakeFiles/line_finder.dir/build.make CMakeFiles/line_finder.dir/src/line_finder.cpp.o.provides.build
+.PHONY : CMakeFiles/line_finder.dir/src/line_finder.cpp.o.provides
 
-CMakeFiles/line_finder.dir/src/line_finder.o.provides.build: CMakeFiles/line_finder.dir/src/line_finder.o
+CMakeFiles/line_finder.dir/src/line_finder.cpp.o.provides.build: CMakeFiles/line_finder.dir/src/line_finder.cpp.o
 
 # Object files for target line_finder
 line_finder_OBJECTS = \
-"CMakeFiles/line_finder.dir/src/line_finder.o"
+"CMakeFiles/line_finder.dir/src/line_finder.cpp.o"
 
 # External object files for target line_finder
 line_finder_EXTERNAL_OBJECTS =
 
-bin/line_finder: CMakeFiles/line_finder.dir/src/line_finder.o
+bin/line_finder: CMakeFiles/line_finder.dir/src/line_finder.cpp.o
 bin/line_finder: CMakeFiles/line_finder.dir/build.make
 bin/line_finder: CMakeFiles/line_finder.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking CXX executable bin/line_finder"
@@ -124,7 +108,7 @@ bin/line_finder: CMakeFiles/line_finder.dir/link.txt
 CMakeFiles/line_finder.dir/build: bin/line_finder
 .PHONY : CMakeFiles/line_finder.dir/build
 
-CMakeFiles/line_finder.dir/requires: CMakeFiles/line_finder.dir/src/line_finder.o.requires
+CMakeFiles/line_finder.dir/requires: CMakeFiles/line_finder.dir/src/line_finder.cpp.o.requires
 .PHONY : CMakeFiles/line_finder.dir/requires
 
 CMakeFiles/line_finder.dir/clean:
@@ -132,6 +116,6 @@ CMakeFiles/line_finder.dir/clean:
 .PHONY : CMakeFiles/line_finder.dir/clean
 
 CMakeFiles/line_finder.dir/depend:
-	cd /home/art/ROS/USCAerialRobotics/art_lrf && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/art/ROS/USCAerialRobotics/art_lrf /home/art/ROS/USCAerialRobotics/art_lrf /home/art/ROS/USCAerialRobotics/art_lrf /home/art/ROS/USCAerialRobotics/art_lrf /home/art/ROS/USCAerialRobotics/art_lrf/CMakeFiles/line_finder.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/russell/ros/USCAerialRobotics/art_lrf && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/russell/ros/USCAerialRobotics/art_lrf /home/russell/ros/USCAerialRobotics/art_lrf /home/russell/ros/USCAerialRobotics/art_lrf /home/russell/ros/USCAerialRobotics/art_lrf /home/russell/ros/USCAerialRobotics/art_lrf/CMakeFiles/line_finder.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/line_finder.dir/depend
 

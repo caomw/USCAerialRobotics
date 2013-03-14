@@ -1,7 +1,6 @@
 FILE(REMOVE_RECURSE
+  "msg_gen"
   "src/art_lrf/msg"
-  "msg_gen"
-  "msg_gen"
   "CMakeFiles/ROSBUILD_genmsg_py"
   "src/art_lrf/msg/__init__.py"
   "src/art_lrf/msg/_Lines.py"

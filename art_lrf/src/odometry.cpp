@@ -77,7 +77,6 @@ public:
 //     vector<measurement> measurements;
 //     void update(measurement newMeasurement)
 //     {
-<<<<<<< HEAD
 //      if( measurements.size() == 0)
 //          {
 //              measurements.push_back(newMeasurement);
@@ -101,29 +100,6 @@ vector<float> linspace(double min_range, double max_range, int
     phi[i]=phi[i-1]+delta;
 
   return phi;
-=======
-// 	if( measurements.size() == 0)
-// 	    {
-// 		measurements.push_back(newMeasurement);
-// 		return;
-// 	    }
-		
-
-// 	measurement currentMeasurement = measurements(measurements.size()-1);
-//     }
-			   
-	       
-// } waypoints;
-
-vector<float> linspace(double min_range, double max_range, int total_no_points)  {
-    vector<float> phi = std::vector<float>(total_no_points);
-    phi[0] = min_range;
-    double delta = (max_range-min_range)/(total_no_points - 1);
-    for(int i = 1 ; i < phi.size() ; i++)
-        phi[i]=phi[i-1]+delta;
-
-    return phi;
->>>>>>> 176870b524a4a23b5aa1b398026f748cd3ca0abb
 }
 
 void compare_scans(boost::shared_ptr<vector<line> > firstScan,
