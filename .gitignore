@@ -39,3 +39,10 @@ build
 bin
 *.cfgc
 *.swp
+*CMakeFile*
+*catkin*
+*CATKIN*
+CMakeCache.txt
+*gtest*
+devel
+Makefile
