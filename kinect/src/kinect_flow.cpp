@@ -18,10 +18,10 @@
 #include <message_filters/sync_policies/approximate_time.h>
 #include <fovis/fovis.hpp>
 
-#include <tf/tf.h>
-#include <tf/transform_broadcaster.h>
+//#include <tf/tf.h>
+//#include <tf/transform_broadcaster.h>
 
-#include <nav_msgs/Odometry.h>
+//#include <nav_msgs/Odometry.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -72,7 +72,7 @@ private:
     fovis::Rectification * rect;
     int width;
     int height;
-    tf::TransformBroadcaster tf_broadcaster_;
+    //tf::TransformBroadcaster tf_broadcaster_;
 
     ros::Publisher odom_pub_;
 
@@ -90,7 +90,7 @@ public:
 
 	this->nh = _nh;
 
-	odom_pub_ = _nh.advertise<nav_msgs::Odometry>("fovis_odometry", 1000);
+	//odom_pub_ = _nh.advertise<nav_msgs::Odometry>("fovis_odometry", 1000);
 
 	subImageCount = 0;
 	imgColor = Mat(cv::Size(640, 480), CV_8UC3);
@@ -205,7 +205,7 @@ private:
 	Eigen::Quaterniond quat(cam_to_local.rotation());
 	Eigen::Vector3d trans(cam_to_local.translation());
 
-	tf::StampedTransform transform;
+	// tf::StampedTransform transform;
 
 	// btQuaternion btquat;
 	// btquat.setX(quat.x());

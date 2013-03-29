@@ -38,5 +38,5 @@ rosbuild_add_executable(flow src/kinect_flow.cpp)
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 #target_link_libraries(example ${PROJECT_NAME})
 target_link_libraries(kinect ${OpenCV_LIBS} fovis OpenNI)
-target_link_libraries(flow ${OpenCV_LIBS}  OpenNI)
+target_link_libraries(flow ${OpenCV_LIBS}  fovis OpenNI)
 
