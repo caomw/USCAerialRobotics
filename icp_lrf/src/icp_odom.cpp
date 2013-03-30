@@ -160,7 +160,7 @@ public:
 	    std::cout << "base_size:" << base_scan.ranges.size() << std::endl;
 	    std::cout << "target_size:" << current_scan.ranges.size() << std::endl;
 
-	    updateTransform(base_scan, current_scan);
+	    //updateTransform(base_scan, current_scan);
 	    cout << "base_scan: " << endl << base_scan.transform << endl << endl;
 	    cout << "current_scan: " << endl << current_scan.transform << endl << endl;
 

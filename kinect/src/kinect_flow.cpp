@@ -43,12 +43,21 @@
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include <Eigen/Geometry>
+#include <Eigen/Eigen>
+#include <Eigen/Core>
+#include <Eigen/LU>
+#include <Eigen/SVD>
+
 
 namespace enc = sensor_msgs::image_encodings;
 
 
 using namespace std;
 using namespace cv;
+using namespace Eigen;
+
+struct float3{ float x; float y; float z;};
 
 class kinectNode {
 
@@ -62,6 +71,7 @@ private:
 
     Mat imgColor;
     Mat imgDepth;
+    Mat imgDepthPrevious;
     Mat imgGray;
     Mat imgGrayPrevious;
     Mat imgCorner;
@@ -95,6 +105,7 @@ public:
 	subImageCount = 0;
 	imgColor = Mat(cv::Size(640, 480), CV_8UC3);
 	imgDepth = Mat(cv::Size(640, 480), CV_32FC1);
+	imgDepthPrevious = Mat(cv::Size(640, 480), CV_32FC1);
 	imgGrayPrevious = Mat(cv::Size(640, 480), CV_8UC1);
 	imgGray = Mat(cv::Size(640, 480), CV_8UC1);
 
@@ -154,13 +165,11 @@ private:
 
     void subImageCallback(const sensor_msgs::ImageConstPtr& msg_rgb, const sensor_msgs::ImageConstPtr& msg_depth) {
 
-	std::cout << "GOT A NEW DEPTH IMAGE: " << msg_depth->encoding << " !!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-
-
-	std::cout << "Image Callback: " << msg_rgb->header.stamp << " | " << msg_depth->header.stamp << std::endl;
+	// std::cout << "GOT A NEW DEPTH IMAGE: " << msg_depth->encoding << " !!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+	// std::cout << "Image Callback: " << msg_rgb->header.stamp << " | " << msg_depth->header.stamp << std::endl;
 
 	subImageCount++;
-	cout << "Got image number: " << subImageCount << endl;
+	// cout << "Got image number: " << subImageCount << endl;
 			
                         
 	// convert image from ROS image message to OpenCV Mat
@@ -178,68 +187,122 @@ private:
 
 	cvtColor(imgColor, imgGray, CV_RGB2GRAY);
 			
-
-
-	//cv::imshow("rgb image", imgColor);
-	//cv::waitKey(1);
-
-	//cv::imshow("depth image", imgDepth);
-	//cv::waitKey(1);
-
+	//Do things with the image here
+	
+	vector<Point2f> *corners = new vector<Point2f>();
 	cvtColor(imgColor, imgGray, CV_RGB2GRAY);
+	
+	if(subImageCount <= 1) {
+	    imgGrayPrevious = imgGray.clone();
+	    imgDepthPrevious = imgDepth.clone();
+	    return;
+	}
+	
+	goodFeaturesToTrack(imgGrayPrevious, *corners, 100, .1, 10, Mat(), 3, true, .04);
 
-	// float* depth_data = new float[width*height];
-	// depth_data = reinterpret_cast<float*>(imgDepth.data);
-	// for( int i=0; i<width*height; i++)
+	//corners->clear();
+	// for(int i=50; i<320; i+=50)
 	// {
-	//     depth_data[i] = depth_data[i]!=0 ? depth_data[i]*1e-3 : NAN;
+	//     for(int j=100; j<320; j+=100)
+	//     {
+	// 	Point2f temp(i,j);
+	// 	corners->push_back(temp);
+	//     }
 	// }
 
-	depth_image_->setDepthImage(reinterpret_cast<float*>(imgDepth.data));
-	//depth_image_->setDepthImage((depth_data));
-	odom->processFrame(imgGray.data, depth_image_);
+	
+	vector<Point2f> *nextCorners = new vector<Point2f>((*corners).size(), Point2f(0, 0));
+	vector<uchar> status;
+	vector<float> errors;
+	
 
-	Eigen::Isometry3d cam_to_local = odom->getPose();
-	Eigen::Isometry3d motion_estimate = odom->getMotionEstimate();
+	calcOpticalFlowPyrLK(imgGrayPrevious, imgGray, *corners, *nextCorners, status, errors, Size(21,21), OPTFLOW_USE_INITIAL_FLOW, TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, 30, 0.3), 0, .0001);
+	
+	
+	for(unsigned int i = 0; i < corners->size(); i++) {
+	    circle(imgColor, (*corners)[i], 8, cvScalar(255, 0, 0), 2, 8, 0);
+	    line(imgColor, (*corners)[i], (*nextCorners)[i], cvScalar(0, 0, 255), 1, 8, 0);
+	}
 
-	Eigen::Quaterniond quat(cam_to_local.rotation());
-	Eigen::Vector3d trans(cam_to_local.translation());
+	vector<float3> * flows = new vector<float3>;
+	vector<float3> * corners3d = new vector<float3>;
+	vector<float3> * nextCorners3d = new vector<float3>;
 
-	// tf::StampedTransform transform;
+	corners3d->clear();
+	nextCorners3d->clear();
+	flows->clear();
 
-	// btQuaternion btquat;
-	// btquat.setX(quat.x());
-	// btquat.setY(quat.y());
-	// btquat.setZ(quat.z());
-	// btquat.setW(quat.w());
-
-	// btVector3 bttranslation;
-	// bttranslation.setX(trans.x());
-	// bttranslation.setY(trans.y());
-	// bttranslation.setZ(trans.z());
-
-	// btTransform btTrans(btquat, bttranslation);
-
-	// tf::StampedTransform stampedtrans(btTrans, ros::Time::now(), "/world", "/fovis_frame");
-	// tf_broadcaster_.sendTransform(stampedtrans);
+	for(int i=0; i<corners->size(); i++)
+	{
+	    float3 temp;
+	    temp.z = imgDepthPrevious.at<float>(corners->at(i).x, corners->at(i).y);
+	    temp.x = temp.z * (corners->at(i).x - rgb_params_.cx)/rgb_params_.fx;
+	    temp.y = -temp.z * (corners->at(i).y - rgb_params_.cy)/rgb_params_.fy;
 
 
-	// nav_msgs::Odometry odom_msg;
-	// odom_msg.header.frame_id = "kinect";
-	// odom_msg.header.stamp = ros::Time::now();
-	// odom_msg.pose.pose.position.x = cam_to_local.translation().x();
-	// odom_msg.pose.pose.position.y = cam_to_local.translation().y();
-	// odom_msg.pose.pose.position.z = cam_to_local.translation().z();
+	    float3 nextTemp;
+	    nextTemp.z = imgDepth.at<float>(nextCorners->at(i).x, nextCorners->at(i).y);
+	    nextTemp.x = nextTemp.z * (nextCorners->at(i).x - rgb_params_.cx)/rgb_params_.fx;
+	    nextTemp.y = -nextTemp.z * (nextCorners->at(i).y - rgb_params_.cy)/rgb_params_.fy;
 
-	// odom_msg.pose.pose.orientation.w = quat.w();
-	// odom_msg.pose.pose.orientation.x = quat.x();
-	// odom_msg.pose.pose.orientation.y = quat.y();
-	// odom_msg.pose.pose.orientation.z = quat.z();
+	    if( !isnan(temp.z) && !isnan(nextTemp.z) )
+	    {
+		corners3d->push_back(temp);
+		nextCorners3d->push_back(nextTemp);
+	    }
+	}
 
-	// odom_pub_.publish(odom_msg);
+	for(int i=0; i<corners3d->size(); i++)
+	{
+	    float3 temp;
+	    temp.x = nextCorners3d->at(i).x - corners3d->at(i).x;
+	    temp.y = nextCorners3d->at(i).y - corners3d->at(i).y;
+	    temp.z = nextCorners3d->at(i).z - corners3d->at(i).z;
+	    flows->push_back(temp);
+	    // printf("flows, i: %i3, x: %f8, y: %f8, z: %f8 \n", i, temp.x, temp.y, temp.z);
+	}
+	
+	MatrixXd cornersMat(3, corners3d->size());
+	MatrixXd nextCornersMat(3, corners3d->size());
 
-	std::cout << isometryToString(cam_to_local) << " " << isometryToString(motion_estimate) << "\n";
-	//delete[] depth_data;
+    	for(int i=0; i<corners3d->size(); i++)
+	{
+	    cornersMat(0,i) = corners3d->at(i).x;
+	    cornersMat(1,i) = corners3d->at(i).y;
+	    cornersMat(2,i) = corners3d->at(i).z;
+
+	    nextCornersMat(0,i) = nextCorners3d->at(i).x;
+	    nextCornersMat(1,i) = nextCorners3d->at(i).y;
+	    nextCornersMat(2,i) = nextCorners3d->at(i).z;
+	}
+	
+	cout << umeyama(cornersMat, cornersMat, true) << endl;
+
+	
+
+	//Display that image back onto the window
+	cv::imshow("Image", imgColor);
+	// cv::imshow("Image", imgGrayPrevious);
+	
+	//Wait...
+	cv::waitKey(1);
+	if(subImageCount <= 100) {
+	    imgGrayPrevious = imgGray.clone();
+	    imgDepthPrevious = imgDepth.clone();
+	    return;
+	}
+
+
+	
+
+	// imgGrayPrevious = imgGray.clone();
+	// imgDepthPrevious = imgDepth.clone();
+	delete corners;
+	delete nextCorners;
+	delete corners3d;
+	delete nextCorners3d;
+
+
 
     }
 
@@ -261,82 +324,6 @@ private:
 	}
 
         
-    void subImageCallback2(const sensor_msgs::ImageConstPtr& msg) {
-	//if(subImageCount % 4 != 0) {
-	//subImageCount++;
-	//return;
-	//}
-	
-	subImageCount++;
-	cout << "Got image number: " << subImageCount << endl;
-	
-	
-	//convert image from ROS image message to OpenCV Mat
-	convert_image(msg, imgColor);
-	
-	//Do things with the image here
-	
-	vector<Point2f> *corners = new vector<Point2f>();
-	cvtColor(imgColor, imgGray, CV_RGB2GRAY);
-	
-	if(subImageCount <= 1) {
-	    imgGrayPrevious = imgGray;
-	    return;
-	}
-	
-	goodFeaturesToTrack(imgGrayPrevious, *corners, 100, .1, 10, Mat(), 3, true, .04);
-
-	corners->clear();
-	for(int i=0; i<320; i+=50)
-	{
-	    for(int j=0; j<320; j+=100)
-	    {
-		Point2f temp(i,j);
-		corners->push_back(temp);
-	    }
-	}
-
-	for(int i=0; i<corners->size(); i++)
-	{
-	    cout << "i:   " << corners->at(i) << endl;
-	}
-
-	
-
-	
-	vector<Point2f> *nextPoints = new vector<Point2f>((*corners).size(), Point2f(0, 0));
-	vector<uchar> status;
-	vector<float> errors;
-	
-
-	calcOpticalFlowPyrLK(imgGrayPrevious, imgGray, *corners, *nextPoints, status, errors, Size(21,21), OPTFLOW_USE_INITIAL_FLOW, TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, 30, 0.3), 0, .0001);
-	
-	for(int i = 0; i < corners->size(); i++) {
-	    printf("corners: x = %f y = %f  nextPts: x = %f y = %f\n", (*corners)[i].x, (*corners)[i].y, (*nextPoints)[i].x, (*nextPoints)[i].y);
-	}
-	
-	cout << "Drawing circles..." << endl;
-	for(unsigned int i = 0; i < corners->size(); i++) {
-	    cout << "point " << i << " x = " << (*corners)[i].x << "  y = " << (*corners)[i].y << endl;
-	    circle(imgColor, (*corners)[i], 8, cvScalar(255, 0, 0), 2, 8, 0);
-	}
-	
-	cout << "Drawing lines..." << endl;
-	cout << "corners size: " << corners->size() << "  nextpoints size: " << nextPoints->size() << endl;
-	for(unsigned int i = 0; i < corners->size(); i++) {
-	    cout << i << endl;
-	    line(imgColor, (*corners)[i], (*nextPoints)[i], cvScalar(0, 0, 255), 1, 8, 0);
-	}
-	cout << "Done drawing" << endl;
-	
-	
-	//Display that image back onto the window
-	cv::imshow("Image", imgColor);
-	
-	//Wait...
-	cv::waitKey(1);
-	imgGrayPrevious = imgGray.clone();
-    }
 
     void convert_image(const sensor_msgs::ImageConstPtr& _msg, Mat& _img)
 	{
@@ -347,7 +334,7 @@ private:
 
 
 
-};
+    };
 
 int main(int argc, char** argv)
 {

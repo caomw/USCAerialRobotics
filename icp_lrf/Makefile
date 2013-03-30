@@ -8,7 +8,7 @@ default_target: all
 #=============================================================================
 # Special targets provided by cmake.
 
-# Disable implicit rules so canonical targets will work.
+# Disable implicit rules so canoncical targets will work.
 .SUFFIXES:
 
 # Remove some rules from gmake that .SUFFIXES does not remove.
@@ -36,10 +36,10 @@ CMAKE_COMMAND = /usr/bin/cmake
 RM = /usr/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/russell/ros/USCAerialRobotics/icp_lrf
+CMAKE_SOURCE_DIR = /home/art/ros/USCAerialRobotics/icp_lrf
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/russell/ros/USCAerialRobotics/icp_lrf
+CMAKE_BINARY_DIR = /home/art/ros/USCAerialRobotics/icp_lrf
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -54,47 +54,6 @@ edit_cache:
 edit_cache/fast: edit_cache
 .PHONY : edit_cache/fast
 
-# Special rule for the target install
-install: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
-.PHONY : install
-
-# Special rule for the target install
-install/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
-.PHONY : install/fast
-
-# Special rule for the target install/local
-install/local: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local
-
-# Special rule for the target install/local
-install/local/fast: install/local
-.PHONY : install/local/fast
-
-# Special rule for the target install/strip
-install/strip: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip
-
-# Special rule for the target install/strip
-install/strip/fast: install/strip
-.PHONY : install/strip/fast
-
-# Special rule for the target list_install_components
-list_install_components:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
-.PHONY : list_install_components
-
-# Special rule for the target list_install_components
-list_install_components/fast: list_install_components
-.PHONY : list_install_components/fast
-
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -107,9 +66,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/russell/ros/USCAerialRobotics/icp_lrf/CMakeFiles /home/russell/ros/USCAerialRobotics/icp_lrf/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/art/ros/USCAerialRobotics/icp_lrf/CMakeFiles /home/art/ros/USCAerialRobotics/icp_lrf/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/russell/ros/USCAerialRobotics/icp_lrf/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/art/ros/USCAerialRobotics/icp_lrf/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -163,17 +122,17 @@ ROSBUILD_genmsg_cpp/fast:
 .PHONY : ROSBUILD_genmsg_cpp/fast
 
 #=============================================================================
-# Target rules for targets named ROSBUILD_genmsg_py
+# Target rules for targets named ROSBUILD_genmsg_lisp
 
 # Build rule for target.
-ROSBUILD_genmsg_py: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ROSBUILD_genmsg_py
-.PHONY : ROSBUILD_genmsg_py
+ROSBUILD_genmsg_lisp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ROSBUILD_genmsg_lisp
+.PHONY : ROSBUILD_genmsg_lisp
 
 # fast build rule for target.
-ROSBUILD_genmsg_py/fast:
-	$(MAKE) -f CMakeFiles/ROSBUILD_genmsg_py.dir/build.make CMakeFiles/ROSBUILD_genmsg_py.dir/build
-.PHONY : ROSBUILD_genmsg_py/fast
+ROSBUILD_genmsg_lisp/fast:
+	$(MAKE) -f CMakeFiles/ROSBUILD_genmsg_lisp.dir/build.make CMakeFiles/ROSBUILD_genmsg_lisp.dir/build
+.PHONY : ROSBUILD_genmsg_lisp/fast
 
 #=============================================================================
 # Target rules for targets named ROSBUILD_gensrv_cpp
@@ -189,30 +148,30 @@ ROSBUILD_gensrv_cpp/fast:
 .PHONY : ROSBUILD_gensrv_cpp/fast
 
 #=============================================================================
-# Target rules for targets named clean_test_results
+# Target rules for targets named ROSBUILD_gensrv_lisp
 
 # Build rule for target.
-clean_test_results: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 clean_test_results
-.PHONY : clean_test_results
+ROSBUILD_gensrv_lisp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ROSBUILD_gensrv_lisp
+.PHONY : ROSBUILD_gensrv_lisp
 
 # fast build rule for target.
-clean_test_results/fast:
-	$(MAKE) -f CMakeFiles/clean_test_results.dir/build.make CMakeFiles/clean_test_results.dir/build
-.PHONY : clean_test_results/fast
+ROSBUILD_gensrv_lisp/fast:
+	$(MAKE) -f CMakeFiles/ROSBUILD_gensrv_lisp.dir/build.make CMakeFiles/ROSBUILD_gensrv_lisp.dir/build
+.PHONY : ROSBUILD_gensrv_lisp/fast
 
 #=============================================================================
-# Target rules for targets named doxygen
+# Target rules for targets named clean-test-results
 
 # Build rule for target.
-doxygen: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 doxygen
-.PHONY : doxygen
+clean-test-results: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 clean-test-results
+.PHONY : clean-test-results
 
 # fast build rule for target.
-doxygen/fast:
-	$(MAKE) -f CMakeFiles/doxygen.dir/build.make CMakeFiles/doxygen.dir/build
-.PHONY : doxygen/fast
+clean-test-results/fast:
+	$(MAKE) -f CMakeFiles/clean-test-results.dir/build.make CMakeFiles/clean-test-results.dir/build
+.PHONY : clean-test-results/fast
 
 #=============================================================================
 # Target rules for targets named icp_odom
@@ -226,19 +185,6 @@ icp_odom: cmake_check_build_system
 icp_odom/fast:
 	$(MAKE) -f CMakeFiles/icp_odom.dir/build.make CMakeFiles/icp_odom.dir/build
 .PHONY : icp_odom/fast
-
-#=============================================================================
-# Target rules for targets named rosbuild_clean-test-results
-
-# Build rule for target.
-rosbuild_clean-test-results: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 rosbuild_clean-test-results
-.PHONY : rosbuild_clean-test-results
-
-# fast build rule for target.
-rosbuild_clean-test-results/fast:
-	$(MAKE) -f CMakeFiles/rosbuild_clean-test-results.dir/build.make CMakeFiles/rosbuild_clean-test-results.dir/build
-.PHONY : rosbuild_clean-test-results/fast
 
 #=============================================================================
 # Target rules for targets named rosbuild_precompile
@@ -280,19 +226,6 @@ rospack_genmsg/fast:
 .PHONY : rospack_genmsg/fast
 
 #=============================================================================
-# Target rules for targets named rospack_genmsg_all
-
-# Build rule for target.
-rospack_genmsg_all: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 rospack_genmsg_all
-.PHONY : rospack_genmsg_all
-
-# fast build rule for target.
-rospack_genmsg_all/fast:
-	$(MAKE) -f CMakeFiles/rospack_genmsg_all.dir/build.make CMakeFiles/rospack_genmsg_all.dir/build
-.PHONY : rospack_genmsg_all/fast
-
-#=============================================================================
 # Target rules for targets named rospack_genmsg_libexe
 
 # Build rule for target.
@@ -317,19 +250,6 @@ rospack_gensrv: cmake_check_build_system
 rospack_gensrv/fast:
 	$(MAKE) -f CMakeFiles/rospack_gensrv.dir/build.make CMakeFiles/rospack_gensrv.dir/build
 .PHONY : rospack_gensrv/fast
-
-#=============================================================================
-# Target rules for targets named run_tests
-
-# Build rule for target.
-run_tests: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 run_tests
-.PHONY : run_tests
-
-# fast build rule for target.
-run_tests/fast:
-	$(MAKE) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/build
-.PHONY : run_tests/fast
 
 #=============================================================================
 # Target rules for targets named test
@@ -396,79 +316,35 @@ tests/fast:
 	$(MAKE) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/build
 .PHONY : tests/fast
 
-#=============================================================================
-# Target rules for targets named gtest
-
-# Build rule for target.
-gtest: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 gtest
-.PHONY : gtest
-
-# fast build rule for target.
-gtest/fast:
-	$(MAKE) -f gtest/CMakeFiles/gtest.dir/build.make gtest/CMakeFiles/gtest.dir/build
-.PHONY : gtest/fast
-
-#=============================================================================
-# Target rules for targets named gtest_main
-
-# Build rule for target.
-gtest_main: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 gtest_main
-.PHONY : gtest_main
-
-# fast build rule for target.
-gtest_main/fast:
-	$(MAKE) -f gtest/CMakeFiles/gtest_main.dir/build.make gtest/CMakeFiles/gtest_main.dir/build
-.PHONY : gtest_main/fast
-
-src/IMU_odom.o: src/IMU_odom.cpp.o
+# target to build an object file
+src/IMU_odom.o:
+	$(MAKE) -f CMakeFiles/IMU_odom.dir/build.make CMakeFiles/IMU_odom.dir/src/IMU_odom.o
 .PHONY : src/IMU_odom.o
 
-# target to build an object file
-src/IMU_odom.cpp.o:
-	$(MAKE) -f CMakeFiles/IMU_odom.dir/build.make CMakeFiles/IMU_odom.dir/src/IMU_odom.cpp.o
-.PHONY : src/IMU_odom.cpp.o
-
-src/IMU_odom.i: src/IMU_odom.cpp.i
+# target to preprocess a source file
+src/IMU_odom.i:
+	$(MAKE) -f CMakeFiles/IMU_odom.dir/build.make CMakeFiles/IMU_odom.dir/src/IMU_odom.i
 .PHONY : src/IMU_odom.i
 
-# target to preprocess a source file
-src/IMU_odom.cpp.i:
-	$(MAKE) -f CMakeFiles/IMU_odom.dir/build.make CMakeFiles/IMU_odom.dir/src/IMU_odom.cpp.i
-.PHONY : src/IMU_odom.cpp.i
-
-src/IMU_odom.s: src/IMU_odom.cpp.s
+# target to generate assembly for a file
+src/IMU_odom.s:
+	$(MAKE) -f CMakeFiles/IMU_odom.dir/build.make CMakeFiles/IMU_odom.dir/src/IMU_odom.s
 .PHONY : src/IMU_odom.s
 
-# target to generate assembly for a file
-src/IMU_odom.cpp.s:
-	$(MAKE) -f CMakeFiles/IMU_odom.dir/build.make CMakeFiles/IMU_odom.dir/src/IMU_odom.cpp.s
-.PHONY : src/IMU_odom.cpp.s
-
-src/icp_odom.o: src/icp_odom.cpp.o
+# target to build an object file
+src/icp_odom.o:
+	$(MAKE) -f CMakeFiles/icp_odom.dir/build.make CMakeFiles/icp_odom.dir/src/icp_odom.o
 .PHONY : src/icp_odom.o
 
-# target to build an object file
-src/icp_odom.cpp.o:
-	$(MAKE) -f CMakeFiles/icp_odom.dir/build.make CMakeFiles/icp_odom.dir/src/icp_odom.cpp.o
-.PHONY : src/icp_odom.cpp.o
-
-src/icp_odom.i: src/icp_odom.cpp.i
+# target to preprocess a source file
+src/icp_odom.i:
+	$(MAKE) -f CMakeFiles/icp_odom.dir/build.make CMakeFiles/icp_odom.dir/src/icp_odom.i
 .PHONY : src/icp_odom.i
 
-# target to preprocess a source file
-src/icp_odom.cpp.i:
-	$(MAKE) -f CMakeFiles/icp_odom.dir/build.make CMakeFiles/icp_odom.dir/src/icp_odom.cpp.i
-.PHONY : src/icp_odom.cpp.i
-
-src/icp_odom.s: src/icp_odom.cpp.s
-.PHONY : src/icp_odom.s
-
 # target to generate assembly for a file
-src/icp_odom.cpp.s:
-	$(MAKE) -f CMakeFiles/icp_odom.dir/build.make CMakeFiles/icp_odom.dir/src/icp_odom.cpp.s
-.PHONY : src/icp_odom.cpp.s
+src/icp_odom.s:
+	$(MAKE) -f CMakeFiles/icp_odom.dir/build.make CMakeFiles/icp_odom.dir/src/icp_odom.s
+.PHONY : src/icp_odom.s
 
 # Help Target
 help:
@@ -478,32 +354,23 @@ help:
 	@echo "... depend"
 	@echo "... IMU_odom"
 	@echo "... ROSBUILD_genmsg_cpp"
-	@echo "... ROSBUILD_genmsg_py"
+	@echo "... ROSBUILD_genmsg_lisp"
 	@echo "... ROSBUILD_gensrv_cpp"
-	@echo "... clean_test_results"
-	@echo "... doxygen"
+	@echo "... ROSBUILD_gensrv_lisp"
+	@echo "... clean-test-results"
 	@echo "... edit_cache"
 	@echo "... icp_odom"
-	@echo "... install"
-	@echo "... install/local"
-	@echo "... install/strip"
-	@echo "... list_install_components"
 	@echo "... rebuild_cache"
-	@echo "... rosbuild_clean-test-results"
 	@echo "... rosbuild_precompile"
 	@echo "... rosbuild_premsgsrvgen"
 	@echo "... rospack_genmsg"
-	@echo "... rospack_genmsg_all"
 	@echo "... rospack_genmsg_libexe"
 	@echo "... rospack_gensrv"
-	@echo "... run_tests"
 	@echo "... test"
 	@echo "... test-future"
 	@echo "... test-results"
 	@echo "... test-results-run"
 	@echo "... tests"
-	@echo "... gtest"
-	@echo "... gtest_main"
 	@echo "... src/IMU_odom.o"
 	@echo "... src/IMU_odom.i"
 	@echo "... src/IMU_odom.s"
